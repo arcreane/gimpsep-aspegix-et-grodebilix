@@ -64,9 +64,49 @@ void interface::chooseOperation() {
       showCurrentImage();
       break;
     case 3 : {
-      erosion *er = new erosion();
-      setCurrentImage(er->dilateColor(getCurrentImage(), 3));
-      delete er;
+
+      int option;
+      int erotionSize;
+      std::cout << "1. Grayscale erosion" << std::endl;
+      std::cout << "2. Color erosion" << std::endl;
+      std::cout << "3. Grayscale dilatation" << std::endl;
+      std::cout << "4. Color dilatation" << std::endl;
+      std::cout << "What modification would you like to do : ";
+      std::cin >> option;
+
+      std::cout << "Input erosion / dilatation size : ";
+      std::cin >> erotionSize;
+
+      switch (option) {
+        case 1: {
+          erosion *er = new erosion();
+          setCurrentImage(er->erodeGrayScale(getCurrentImage(), erotionSize));
+          delete er;
+          break;
+        }
+        case 2: {
+          erosion *er = new erosion();
+          setCurrentImage(er->erodeColor(getCurrentImage(), erotionSize));
+          delete er;
+          break;
+        }
+        case 3: {
+          erosion *er = new erosion();
+          setCurrentImage(er->dilateGrayScale(getCurrentImage(), erotionSize));
+          delete er;
+          break;
+        }
+        case 4: {
+          erosion *er = new erosion();
+          setCurrentImage(er->dilateColor(getCurrentImage(), erotionSize));
+          delete er;
+          break;
+        }
+        default:
+          break;
+      }
+
+
       break;
     }
     case 4:
@@ -80,8 +120,16 @@ void interface::chooseOperation() {
       break;
     case 7: {
 
+      double lowThreshold;
+      double highThreshold;
+
+      std::cout << "Enter the low threshhold (50 is good) :";
+      std::cin >> lowThreshold;
+      std::cout << "Enter the high threshhold (150 is good) :";
+      std::cin >> highThreshold;
+
       canny *can = new canny();
-      setCurrentImage(can->detectEdges(getCurrentImage(), 50, 150));
+      setCurrentImage(can->detectEdges(getCurrentImage(), lowThreshold, highThreshold));
       delete can;
 
       break;
