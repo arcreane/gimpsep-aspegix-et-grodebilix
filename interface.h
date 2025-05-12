@@ -9,6 +9,7 @@ class interface {
 
   public:
     interface();
+    interface(const cv::Mat &image);
     ~interface();
     void loadNewImage(std::string path);
     void setCurrentImage(cv::Mat image);

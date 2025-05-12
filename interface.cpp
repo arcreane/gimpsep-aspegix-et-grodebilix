@@ -1,6 +1,13 @@
 #include "interface.h"
+#include "erosion/erosion.h"
+#include "canny/canny.h"
 
 interface::interface() {}
+
+interface::interface(const cv::Mat &image) {
+  setCurrentImage(image);
+}
+
 
 void interface::setCurrentImage(cv::Mat img) {
   image = img.clone();
@@ -56,9 +63,12 @@ void interface::chooseOperation() {
     case 2:
       showCurrentImage();
       break;
-    case 3:
-      // TODO: add dilatation / erosion
+    case 3 : {
+      erosion *er = new erosion();
+      setCurrentImage(er->dilateColor(getCurrentImage(), 3));
+      delete er;
       break;
+    }
     case 4:
       // TODO : add resize
       break;
@@ -68,9 +78,14 @@ void interface::chooseOperation() {
     case 6:
       // TODO: add panorama / stitching
       break;
-    case 7:
-      // TODO : add canny edge detection
+    case 7: {
+
+      canny *can = new canny();
+      setCurrentImage(can->detectEdges(getCurrentImage(), 50, 150));
+      delete can;
+
       break;
+    }
     case 8:
       std::exit(0);
       break;
