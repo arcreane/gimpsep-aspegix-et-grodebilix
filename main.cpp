@@ -11,10 +11,8 @@ int main() {
     std::cout << "Enter image path : ";
     std::cin >> imagePath;
 
-    // TODO : Faut que je mette ça à jour mais je ferrais ça quand toutes les fonctionalités de base seront implémentées
-
     image * img = new image(imagePath);
-    interface * inter = new interface(img->getImage());
+    interface * inter = new interface(img);
 
     bool running = true;
     while (running) {

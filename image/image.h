@@ -19,6 +19,7 @@ class image {
     cv::Mat getImage();
     void setImage(cv::Mat image);
     void loadNewImage(std::string path);
+    void addImageToHistorique(cv::Mat image);
     void undo();
     void showHistory();
     void restoreToVersion(int version);

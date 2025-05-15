@@ -18,6 +18,11 @@ void image::setImage(cv::Mat image) {
   currentImage = image;
 }
 
+void image::addImageToHistorique(cv::Mat image) {
+  historique.push_front(image);
+}
+
+
 void image::loadNewImage(std::string path) {
   if (!currentImage.empty()) { // Normalement c'est pas possible que ce soit vide mais au cas où
     historique.push_front(currentImage);
@@ -38,10 +43,20 @@ void image::undo() {
 
 void image::showHistory() {
   int i = 0;
-  for (const cv::Mat img : historique) {
+  std::vector<std::string> windowNames;
+
+  for (const cv::Mat& img : historique) {
     std::string title = "Version n°" + std::to_string(i);
+    cv::namedWindow(title, cv::WINDOW_AUTOSIZE); // Ensure window is registered
     cv::imshow(title, img);
+    windowNames.push_back(title);
     i++;
+  }
+
+  cv::waitKey(0);
+
+  for (const std::string& title : windowNames) {
+    cv::destroyWindow(title);
   }
 }
 

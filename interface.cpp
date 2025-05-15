@@ -4,25 +4,27 @@
 
 interface::interface() {}
 
-interface::interface(const cv::Mat &image) {
-  setCurrentImage(image);
+interface::interface(image* newImg) {
+  img = newImg;
+  //setCurrentImage(image);
 }
 
 
-void interface::setCurrentImage(cv::Mat img) {
-  image = img.clone();
+void interface::setCurrentImage(cv::Mat newImage) {
+  img->setImage(newImage);
 }
 
 void interface::loadNewImage(std::string path) {
-  image = cv::imread(path);
+  //image = cv::imread(path);
+  img->loadNewImage(path);
 }
 
 void interface::showCurrentImage(const std::string& imageName = "") const {
 
   if (imageName.empty()) {
-    cv::imshow("image", image);
+    cv::imshow("image", img->getImage());
   } else {
-    cv::imshow(imageName, image);
+    cv::imshow(imageName, img->getImage());
   }
 
   cv::startWindowThread();
@@ -32,7 +34,7 @@ void interface::showCurrentImage(const std::string& imageName = "") const {
 }
 
 cv::Mat interface::getCurrentImage() {
-  return image;
+  return img->getImage();
 }
 
 void interface::chooseOperation() {
@@ -40,14 +42,18 @@ void interface::chooseOperation() {
   int chosen;
   std::string path;
 
+  std::cout << "--- GESTION DE L'IMAGE ---" << std::endl;
   std::cout << "1. Load and image with it's path" << std::endl;
   std::cout << "2. Show the current image" << std::endl;
-  std::cout << "3. Dilatation / Erosion" << std::endl;
-  std::cout << "4. Resize" << std::endl;
-  std::cout << "5. Lighten / Darken" << std::endl;
-  std::cout << "6. Panorama / stitching" << std::endl;
-  std::cout << "7. Canny edge detection" << std::endl;
-  std::cout << "8. Quit" << std::endl;
+  std::cout << "3. Afficher l'historique des modifications" << std::endl;
+  std::cout << "4. Restaurer une ancienne version de l'image" << std::endl;
+  std::cout << "--- OPERATIONS SUR L'IMAGE ---" << std::endl;
+  std::cout << "5. Dilatation / Erosion" << std::endl;
+  std::cout << "6. Resize" << std::endl;
+  std::cout << "7. Lighten / Darken" << std::endl;
+  std::cout << "8. Panorama / stitching" << std::endl;
+  std::cout << "9. Canny edge detection" << std::endl;
+  std::cout << "10. Quit" << std::endl;
 
   std::cout << "Choose an operation to perform : " << std::endl;
   std::cin >> chosen;
@@ -58,12 +64,23 @@ void interface::chooseOperation() {
       std::cout << "Enter the path of the image you wish to edit : ";
       std::cin >> path;
       loadNewImage(path);
-
       break;
     case 2:
       showCurrentImage();
       break;
-    case 3 : {
+    case 3: {
+      img->showHistory();
+      break;
+    }
+    case 4: {
+
+      int version;
+      std::cout << "Quelle version de l'image voulez vous restaurer :";
+      std::cin >> version;
+      img->restoreToVersion(version);
+      break;
+    }
+    case 5 : {
 
       int option;
       int erotionSize;
@@ -81,24 +98,28 @@ void interface::chooseOperation() {
         case 1: {
           erosion *er = new erosion();
           setCurrentImage(er->erodeGrayScale(getCurrentImage(), erotionSize));
+          img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
         }
         case 2: {
           erosion *er = new erosion();
           setCurrentImage(er->erodeColor(getCurrentImage(), erotionSize));
+          img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
         }
         case 3: {
           erosion *er = new erosion();
           setCurrentImage(er->dilateGrayScale(getCurrentImage(), erotionSize));
+          img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
         }
         case 4: {
           erosion *er = new erosion();
           setCurrentImage(er->dilateColor(getCurrentImage(), erotionSize));
+          img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
         }
@@ -106,19 +127,18 @@ void interface::chooseOperation() {
           break;
       }
 
-
       break;
     }
-    case 4:
+    case 6:
       // TODO : add resize
       break;
-    case 5:
+    case 7:
       // TODO: add lighten / darken
       break;
-    case 6:
+    case 8:
       // TODO: add panorama / stitching
       break;
-    case 7: {
+    case 9: {
 
       double lowThreshold;
       double highThreshold;
@@ -130,11 +150,12 @@ void interface::chooseOperation() {
 
       canny *can = new canny();
       setCurrentImage(can->detectEdges(getCurrentImage(), lowThreshold, highThreshold));
+      img->addImageToHistorique(getCurrentImage());
       delete can;
 
       break;
     }
-    case 8:
+    case 10:
       std::exit(0);
       break;
     default:
