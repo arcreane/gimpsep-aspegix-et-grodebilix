@@ -136,16 +136,16 @@ void interface::chooseOperation() {
       break;
     case 9: {
 
-      double lowThreshold;
-      double highThreshold;
-
-      std::cout << "Enter the low threshhold (50 is good) :";
-      std::cin >> lowThreshold;
-      std::cout << "Enter the high threshhold (150 is good) :";
-      std::cin >> highThreshold;
+      // double lowThreshold;
+      // double highThreshold;
+      //
+      // std::cout << "Enter the low threshhold (50 is good) :";
+      // std::cin >> lowThreshold;
+      // std::cout << "Enter the high threshhold (150 is good) :";
+      // std::cin >> highThreshold;
 
       canny *can = new canny();
-      setCurrentImage(can->detectEdges(getCurrentImage(), lowThreshold, highThreshold));
+      setCurrentImage(can->detectEdges(getCurrentImage()));
       img->addImageToHistorique(getCurrentImage());
       delete can;
 
