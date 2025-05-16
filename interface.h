@@ -2,14 +2,17 @@
 #define INTERFACE_H
 
 #include <opencv2/opencv.hpp>
+#include "image/image.h"
 
 class interface {
 
-  cv::Mat image;
+  //cv::Mat image;
+  image* img;
 
   public:
     interface();
-    interface(const cv::Mat &image);
+    //interface(const cv::Mat &image);
+    interface(image* img);
     ~interface();
     void loadNewImage(std::string path);
     void setCurrentImage(cv::Mat image);
