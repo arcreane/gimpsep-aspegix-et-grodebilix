@@ -4,6 +4,7 @@
 #include "brightness/Brightness.hpp"
 #include "resize/Resize_Image.hpp"
 #include "panorama/panorama.h"
+#include "remove-background/backgroundRemover.h"
 
 interface::interface() {}
 
@@ -56,7 +57,8 @@ void interface::chooseOperation() {
   std::cout << "7. Lighten / Darken" << std::endl;
   std::cout << "8. Panorama / stitching" << std::endl;
   std::cout << "9. Canny edge detection" << std::endl;
-  std::cout << "10. Quit" << std::endl;
+  std::cout << "10. Remove backgound" << std::endl;
+  std::cout << "11. Quit" << std::endl;
 
   std::cout << "Choose an operation to perform : " << std::endl;
   std::cin >> chosen;
@@ -175,7 +177,16 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 10:
+    case 10: {
+
+      backgroundRemover *bgRemover = new backgroundRemover(getCurrentImage());
+      setCurrentImage(bgRemover->thresholding());
+      img->addImageToHistorique(getCurrentImage());
+      delete bgRemover;
+
+      break;
+    }
+    case 11:
       std::exit(0);
       break;
     default:
