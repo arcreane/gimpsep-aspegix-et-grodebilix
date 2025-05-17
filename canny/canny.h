@@ -7,7 +7,7 @@ class canny {
     public:
       canny();
       ~canny();
-      cv::Mat detectEdges(cv::Mat image, double lowThreshold, double highThreshold);
+      cv::Mat detectEdges(cv::Mat image);
 };
 
 

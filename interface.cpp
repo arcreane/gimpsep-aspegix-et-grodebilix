@@ -1,6 +1,9 @@
 #include "interface.h"
 #include "erosion/erosion.h"
 #include "canny/canny.h"
+#include "brightness/Brightness.hpp"
+#include "resize/Resize_Image.hpp"
+#include "panorama/panorama.h"
 
 interface::interface() {}
 
@@ -83,7 +86,6 @@ void interface::chooseOperation() {
     case 5 : {
 
       int option;
-      int erotionSize;
       std::cout << "1. Grayscale erosion" << std::endl;
       std::cout << "2. Color erosion" << std::endl;
       std::cout << "3. Grayscale dilatation" << std::endl;
@@ -91,34 +93,31 @@ void interface::chooseOperation() {
       std::cout << "What modification would you like to do : ";
       std::cin >> option;
 
-      std::cout << "Input erosion / dilatation size : ";
-      std::cin >> erotionSize;
-
       switch (option) {
         case 1: {
           erosion *er = new erosion();
-          setCurrentImage(er->erodeGrayScale(getCurrentImage(), erotionSize));
+          setCurrentImage(er->erodeGrayScale(getCurrentImage()));
           img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
         }
         case 2: {
           erosion *er = new erosion();
-          setCurrentImage(er->erodeColor(getCurrentImage(), erotionSize));
+          setCurrentImage(er->erodeColor(getCurrentImage()));
           img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
         }
         case 3: {
           erosion *er = new erosion();
-          setCurrentImage(er->dilateGrayScale(getCurrentImage(), erotionSize));
+          setCurrentImage(er->dilateGrayScale(getCurrentImage()));
           img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
         }
         case 4: {
           erosion *er = new erosion();
-          setCurrentImage(er->dilateColor(getCurrentImage(), erotionSize));
+          setCurrentImage(er->dilateColor(getCurrentImage()));
           img->addImageToHistorique(getCurrentImage());
           delete er;
           break;
@@ -130,26 +129,47 @@ void interface::chooseOperation() {
       break;
     }
     case 6:
-      // TODO : add resize
+      // TODO : refacto resize pour l'intégrer là dedans
       break;
-    case 7:
-      // TODO: add lighten / darken
+    case 7: {
+      // TODO: refacto lighten / darken pour l'intégrer là dedans
+
+      int choix;
+
+      std::cout << "1. Rendre l'image plus lumineuse" << std::endl;
+      std::cout << "2. Rendre l'image plus sombre" << std::endl;
+
+      std::cin >> choix;
+
+      switch (choix) {
+
+        case 1: {
+          break;
+        }
+
+        case 2: {
+          break;
+        }
+
+        default:
+          break;
+      }
       break;
-    case 8:
-      // TODO: add panorama / stitching
+    }
+    case 8: {
+
+      panorama *pan = new panorama(getCurrentImage());
+
+      setCurrentImage(pan->stitchImages());
+      img->addImageToHistorique(getCurrentImage());
+      delete pan;
+
       break;
+    }
     case 9: {
 
-      double lowThreshold;
-      double highThreshold;
-
-      std::cout << "Enter the low threshhold (50 is good) :";
-      std::cin >> lowThreshold;
-      std::cout << "Enter the high threshhold (150 is good) :";
-      std::cin >> highThreshold;
-
       canny *can = new canny();
-      setCurrentImage(can->detectEdges(getCurrentImage(), lowThreshold, highThreshold));
+      setCurrentImage(can->detectEdges(getCurrentImage()));
       img->addImageToHistorique(getCurrentImage());
       delete can;
 

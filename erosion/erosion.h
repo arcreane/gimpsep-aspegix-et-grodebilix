@@ -9,13 +9,13 @@ public:
 
     ~erosion();
 
-    cv::Mat erodeGrayScale(cv::Mat image, int erosionSize);
+    cv::Mat erodeGrayScale(cv::Mat image);
 
-    cv::Mat erodeColor(cv::Mat image, int erosionSize);
+    cv::Mat erodeColor(cv::Mat image);
 
-    cv::Mat dilateGrayScale(cv::Mat image, int dilatationSize);
+    cv::Mat dilateGrayScale(cv::Mat image);
 
-    cv::Mat dilateColor(cv::Mat image, int dilatationSize);
+    cv::Mat dilateColor(cv::Mat image);
 };
 
 
