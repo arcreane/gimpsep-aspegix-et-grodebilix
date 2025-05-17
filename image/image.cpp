@@ -2,12 +2,12 @@
 
 image::image(std::string path){
   currentImage = cv::imread(path);
-  historique.push_front(currentImage);
+  historique.push_back(currentImage);
 }
 
 image::image(cv::Mat image) {
   currentImage = image;
-  historique.push_front(currentImage);
+  historique.push_back(currentImage);
 }
 
 cv::Mat image::getImage() {
@@ -18,52 +18,94 @@ void image::setImage(cv::Mat image) {
   currentImage = image;
 }
 
-void image::addImageToHistorique(cv::Mat image) {
-  historique.push_front(image);
+void image::addImageToHistorique(const cv::Mat& image) {
+  historique.push_back(image.clone());
 }
 
 
-void image::loadNewImage(std::string path) {
-  if (!currentImage.empty()) { // Normalement c'est pas possible que ce soit vide mais au cas où
-    historique.push_front(currentImage);
-    currentImage = cv::imread(path);
-  } else {
-    currentImage = cv::imread(path);
+void image::loadNewImage(const std::string& path) {
+  if (!currentImage.empty()) {
+    historique.push_back(currentImage.clone());
+  }
+  currentImage = cv::imread(path);
+  if (currentImage.empty()) {
+    std::cerr << "Failed to load image from: " << path << std::endl;
   }
 }
 
 void image::undo() {
   if (historique.size() > 1) {
-    historique.pop_front();
-    currentImage = historique.front();
+    historique.pop_back();
+    currentImage = historique.back();
   } else {
     std::cout << "History is empty" << std::endl;
   }
 }
 
 void image::showHistory() {
-  int i = 0;
-  std::vector<std::string> windowNames;
 
-  for (const cv::Mat& img : historique) {
-    std::string title = "Version n°" + std::to_string(i);
-    cv::namedWindow(title, cv::WINDOW_AUTOSIZE); // Ensure window is registered
-    cv::imshow(title, img);
-    windowNames.push_back(title);
-    i++;
+  if (historique.empty()) {
+    std::cout << "Empty history" << std::endl;
+    return;
   }
 
-  cv::waitKey(0);
+  std::string windowName = "Historique";
+  const int total = historique.size();
+  int index = 0;
 
-  for (const std::string& title : windowNames) {
-    cv::destroyWindow(title);
+  cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+
+  int font = cv::FONT_HERSHEY_SIMPLEX;
+  double fontScale = 1.0;
+  int thickness = 1;
+  cv::Size textSize = cv::getTextSize(windowName, font, 1, 1, NULL);
+
+  while (true) {
+
+
+    // On frait une copie pour pas rajouter du texte sur l'image pour de vrai
+    cv::Mat displayImage = historique[index].clone();
+
+    std::string text = std::to_string(index + 1) + " / " + std::to_string(total);
+
+    int baseline = 0;
+    cv::Size textSize = cv::getTextSize(text, font, fontScale, thickness, &baseline);
+
+    // En bas à droite
+    cv::Point textOrg(displayImage.cols - textSize.width - 10, displayImage.rows - 10);
+
+    // Overlay pout le texte en noir pour qu'on puisse le voir sur fond blanc
+    cv::putText(displayImage, text, textOrg, font, fontScale, cv::Scalar(0, 0, 0), thickness + 2);
+
+    // Texte en blanc
+    cv::putText(displayImage, text, textOrg, font, fontScale, cv::Scalar(255, 255, 255), thickness);
+
+    cv::imshow(windowName, displayImage);
+
+    // Visiblement les flèches ça marche pas trop donc j'ai mis Q et D
+
+    int key = cv::waitKey(0);
+    if (key == 27) { // ESC
+      break;
+    } else if (key == 'q' || key == 'Q') { // Gauche
+      index = (index - 1 + total) % total;
+    } else if (key == 'd' || key == 'D') { // Droite
+      index = (index + 1) % total;
+    }
+
   }
+
+  cv::destroyWindow(windowName);
+
 }
 
 void image::restoreToVersion(int version) {
+
+  if (version < 1 || version > historique.size()) {
+    return;
+  }
+
   cv::Mat temp = currentImage;
-  auto it = historique.begin();
-  std::advance(it, version);
-  currentImage = *it;
-  historique.push_front(temp);
+  currentImage = historique[version] - 1;
+  historique.push_back(temp);
 }

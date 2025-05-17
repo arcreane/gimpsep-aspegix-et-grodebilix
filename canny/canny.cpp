@@ -18,7 +18,14 @@ cv::Mat canny::detectEdges(cv::Mat image) {
 
   // Création de l'image en noir et blanc
   cv::Mat gray;
-  cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  if (image.channels() == 3) {
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  } else {
+    gray = image;
+  }
+
+
+
 
   // Si on rajoute du flou ça rends plus clean sur certaines images mais on perds du détail
   // Je vais commenter pour l'instant à voir si on garde

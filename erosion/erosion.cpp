@@ -18,7 +18,11 @@ cv::Mat erosion::erodeGrayScale(cv::Mat image) {
 
   // Transformation de l'image en noit et blanc
   cv::Mat gray;
-  cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  if (image.channels() == 3) {
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  } else {
+    gray = image;
+  }
 
   // Matrice de treshold
   cv::Mat binary;
@@ -122,7 +126,11 @@ cv::Mat erosion::dilateGrayScale(cv::Mat image) {
 
   // On met l'image en noir et blanc
   cv::Mat gray;
-  cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  if (image.channels() == 3) {
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  } else {
+    gray = image;
+  }
 
   // Création de la matrice binary
   cv::Mat binary;

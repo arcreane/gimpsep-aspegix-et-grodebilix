@@ -1,6 +1,9 @@
 #include "interface.h"
 #include "erosion/erosion.h"
 #include "canny/canny.h"
+#include "brightness/Brightness.hpp"
+#include "resize/Resize_Image.hpp"
+#include "panorama/panorama.h"
 
 interface::interface() {}
 
@@ -126,23 +129,44 @@ void interface::chooseOperation() {
       break;
     }
     case 6:
-      // TODO : add resize
+      // TODO : refacto resize pour l'intégrer là dedans
       break;
-    case 7:
-      // TODO: add lighten / darken
-      break;
-    case 8:
-      // TODO: add panorama / stitching
-      break;
-    case 9: {
+    case 7: {
+      // TODO: refacto lighten / darken pour l'intégrer là dedans
 
-      // double lowThreshold;
-      // double highThreshold;
-      //
-      // std::cout << "Enter the low threshhold (50 is good) :";
-      // std::cin >> lowThreshold;
-      // std::cout << "Enter the high threshhold (150 is good) :";
-      // std::cin >> highThreshold;
+      int choix;
+
+      std::cout << "1. Rendre l'image plus lumineuse" << std::endl;
+      std::cout << "2. Rendre l'image plus sombre" << std::endl;
+
+      std::cin >> choix;
+
+      switch (choix) {
+
+        case 1: {
+          break;
+        }
+
+        case 2: {
+          break;
+        }
+
+        default:
+          break;
+      }
+      break;
+    }
+    case 8: {
+
+      panorama *pan = new panorama(getCurrentImage());
+
+      setCurrentImage(pan->stitchImages());
+      img->addImageToHistorique(getCurrentImage());
+      delete pan;
+
+      break;
+    }
+    case 9: {
 
       canny *can = new canny();
       setCurrentImage(can->detectEdges(getCurrentImage()));
