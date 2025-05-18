@@ -180,7 +180,7 @@ void interface::chooseOperation() {
     case 10: {
 
       backgroundRemover *bgRemover = new backgroundRemover(getCurrentImage());
-      setCurrentImage(bgRemover->thresholding());
+      setCurrentImage(bgRemover->chromaKey());
       img->addImageToHistorique(getCurrentImage());
       delete bgRemover;
 

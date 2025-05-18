@@ -75,3 +75,57 @@ cv::Mat backgroundRemover::thresholding() {
   return foreground;
 
 }
+
+void backgroundRemover::onMouse(int event, int x, int y, int, void* userdata) {
+  if (event != cv::EVENT_LBUTTONDOWN) return;
+
+  backgroundRemover* self = static_cast<backgroundRemover*>(userdata);
+  self->selectedColor = self->image.at<cv::Vec3b>(y, x);
+  self->colorSelected = true;
+
+}
+
+cv::Mat backgroundRemover::chromaKey() {
+
+  colorSelected = false;
+
+  cv::Mat img = image.clone();
+  std::string windowName = "Select a color to remove";
+  cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+  cv::setMouseCallback(windowName, onMouse, this);
+
+  while (!colorSelected) {
+    cv::imshow(windowName, image);
+    if (cv::waitKey(10) == 27) {
+      return image;  // ESC
+    }
+  }
+  cv::destroyWindow(windowName);
+
+  cv::Mat selected(1, 1, CV_8UC3, selectedColor);
+  cv::Mat selectedHSV;
+  cv::cvtColor(selected, selectedHSV, cv::COLOR_BGR2HSV);
+  cv::Vec3b targetHSV = selectedHSV.at<cv::Vec3b>(0, 0);
+
+  int hTolerance = 10;
+  int sTolerance = 60;
+  int vTolerance = 60;
+
+  cv::Scalar lower(targetHSV[0] - hTolerance, std::max(0, targetHSV[1] - sTolerance), std::max(0, targetHSV[2] - vTolerance));
+  cv::Scalar upper(targetHSV[0] + hTolerance, std::min(255, targetHSV[1] + sTolerance), std::min(255, targetHSV[2] + vTolerance));
+
+  cv::Mat hsvImg;
+  cv::cvtColor(img, hsvImg, cv::COLOR_BGR2HSV);
+  cv::Mat mask;
+  cv::inRange(hsvImg, lower, upper, mask);
+
+
+  cv::Mat result(image.size(), image.type(), cv::Scalar(0, 0, 0));
+  cv::Mat invertedMask;
+  cv::bitwise_not(mask, invertedMask);
+  image.copyTo(result, invertedMask);
+
+
+  return result;
+
+}
