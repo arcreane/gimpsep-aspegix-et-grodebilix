@@ -1,9 +1,10 @@
 #include "interface.h"
 #include "erosion/erosion.h"
 #include "canny/canny.h"
-#include "brightness/Brightness.hpp"
-#include "resize/Resize_Image.hpp"
+#include "brightness/brightness.h"
+#include "resize/resize.h"
 #include "panorama/panorama.h"
+#include "remove-background/backgroundRemover.h"
 
 interface::interface() {}
 
@@ -56,7 +57,8 @@ void interface::chooseOperation() {
   std::cout << "7. Lighten / Darken" << std::endl;
   std::cout << "8. Panorama / stitching" << std::endl;
   std::cout << "9. Canny edge detection" << std::endl;
-  std::cout << "10. Quit" << std::endl;
+  std::cout << "10. Remove backgound" << std::endl;
+  std::cout << "11. Quit" << std::endl;
 
   std::cout << "Choose an operation to perform : " << std::endl;
   std::cin >> chosen;
@@ -128,33 +130,23 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 6:
-      // TODO : refacto resize pour l'intégrer là dedans
-      break;
+    case 6: {
+        resize size;
+        cv::Mat result = size.apply(getCurrentImage());
+        if (!result.empty()) {
+            setCurrentImage(result);
+            img->addImageToHistorique(result);
+        }
+        break;
+    }
     case 7: {
-      // TODO: refacto lighten / darken pour l'intégrer là dedans
-
-      int choix;
-
-      std::cout << "1. Rendre l'image plus lumineuse" << std::endl;
-      std::cout << "2. Rendre l'image plus sombre" << std::endl;
-
-      std::cin >> choix;
-
-      switch (choix) {
-
-        case 1: {
-          break;
+        brightness bright;
+        cv::Mat result = bright.apply(getCurrentImage());
+        if (!result.empty()) {
+            setCurrentImage(result);
+            img->addImageToHistorique(result);
         }
-
-        case 2: {
-          break;
-        }
-
-        default:
-          break;
-      }
-      break;
+        break;
     }
     case 8: {
 
@@ -175,7 +167,16 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 10:
+    case 10: {
+
+      backgroundRemover *bgRemover = new backgroundRemover(getCurrentImage());
+      setCurrentImage(bgRemover->chromaKey());
+      img->addImageToHistorique(getCurrentImage());
+      delete bgRemover;
+
+      break;
+    }
+    case 11:
       std::exit(0);
       break;
     default:

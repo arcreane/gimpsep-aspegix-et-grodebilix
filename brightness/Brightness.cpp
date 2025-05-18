@@ -1,43 +1,27 @@
-#include "Brightness.hpp"
+#include "brightness.h"
 #include <iostream>
 
 using namespace std;
 using namespace cv;
 
-BrightnessAdjuster::BrightnessAdjuster() : intensity(0), mode(BrightnessMode::Lighten) {}
+brightness::brightness() : mode(0), value(0) {}
 
-bool BrightnessAdjuster::loadImage() {
-    string imagePath;
-    cout << "Entrez le chemin de l'image : ";
-    cin >> imagePath;
-
-    sourceImage = imread(imagePath, IMREAD_COLOR);
-    if (sourceImage.empty()) {
-        cerr << "Erreur : image non trouvee." << endl;
-        return loadImage();
-    }
-    return true;
-}
-
-bool BrightnessAdjuster::getParameters() {
-    int choix;
-    cout << "\n=== Modification de la luminosite ===\n";
-    cout << "1. Rendre l'image plus lumineuse\n";
-    cout << "2. Rendre l'image plus sombre\n";
+bool brightness::getParameters() {
+    cout << "\n=== Modification de la luminosité ===" << endl;
+    cout << "1. Rendre l'image plus lumineuse" << endl;
+    cout << "2. Rendre l'image plus sombre" << endl;
     cout << "Votre choix : ";
-    cin >> choix;
+    cin >> mode;
 
-    if (choix != 1 && choix != 2) {
+    if (mode != 1 && mode != 2) {
         cerr << "Choix invalide.\n";
         return false;
     }
 
-    mode = (choix == 1) ? BrightnessMode::Lighten : BrightnessMode::Darken;
-
     cout << "Entrez la valeur de luminosité [0 - 100] : ";
-    cin >> intensity;
+    cin >> value;
 
-    if (intensity < 0 || intensity > 100) {
+    if (value < 0 || value > 100) {
         cerr << "Valeur invalide.\n";
         return false;
     }
@@ -45,80 +29,38 @@ bool BrightnessAdjuster::getParameters() {
     return true;
 }
 
-void BrightnessAdjuster::adjust() {
-    resultImage = sourceImage.clone();
-    double factor = intensity / 100.0;
+cv::Mat brightness::changeAndShow(const cv::Mat& image) {
+    Mat result = image.clone();
+    double factor = value / 100.0;
 
-    if (mode == BrightnessMode::Lighten) {
-        resultImage = sourceImage + Scalar(255 * factor, 255 * factor, 255 * factor);
+    if (mode == 1) {
+        result += Scalar(255 * factor, 255 * factor, 255 * factor);
     }
-    else {
-        resultImage = sourceImage * (1.0 - factor);
+    else if (mode == 2) {
+        result = result * (1.0 - factor);
     }
-}
 
-void BrightnessAdjuster::showImages() {
-    Mat resultImage;
     namedWindow("Image Originale", WINDOW_NORMAL);
     namedWindow("Image Modifiée", WINDOW_NORMAL);
 
-    imshow("Image Originale", sourceImage);
-    imshow("Image Modifiée", resultImage);
+    imshow("Image Originale", image);
+    imshow("Image Modifiée", result);
 
     cout << "\nAppuyez sur 'Echap' sur une image pour quitter\n";
-
 
     while (true) {
         int key = waitKey(1);
         if (key == 27) {
             destroyAllWindows();
-            break;
+            return result;
         }
     }
+    return result;
 }
 
-BrightnessAction BrightnessAdjuster::postOptions() {
-    int action;
-    cout << "\n=== Que souhaitez-vous faire ? ===\n";
-    cout << "1. Valider la modification\n";
-    cout << "2. Refaire les paramètres\n";
-    cout << "3. Annuler et quitter\n";
-    cout << "Votre choix : ";
-    cin >> action;
-
-    switch (action) {
-    case 1: return BrightnessAction::Valider;
-    case 2: return BrightnessAction::Modifier;
-    case 3: return BrightnessAction::Annuler;
-    default:
-        cerr << "Choix invalide. On recommence.\n";
-        return BrightnessAction::Modifier;
+cv::Mat brightness::apply(const cv::Mat& image) {
+    if (!getParameters()) {
+        return Mat();
     }
-}
-
-void BrightnessAdjuster::run() {
-    if (!loadImage()) return;
-
-    while (true) {
-        if (!getParameters()) continue;
-
-        adjust();
-        showImages();
-
-        BrightnessAction action = postOptions();
-        if (action == BrightnessAction::Valider) {
-            cout << "Modification validée !" << endl;
-            // Optionnel : imwrite("image_modifiee.jpg", resultImage);
-            break;
-        }
-        else if (action == BrightnessAction::Annuler) {
-            cout << "Annulation." << endl;
-            break;
-        }
-    }
-}
-int main() {
-    BrightnessAdjuster adjuster;
-    adjuster.run();
-    return 0;
+    return changeAndShow(image);
 }
