@@ -2,6 +2,7 @@
 #define EROSION_H
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/objdetect.hpp>
 
 class erosion {
 public:

@@ -5,6 +5,7 @@
 #include "resize/Resize_Image.hpp"
 #include "panorama/panorama.h"
 #include "remove-background/backgroundRemover.h"
+#include "face-detection/faceDetection.h"
 
 interface::interface() {}
 
@@ -58,7 +59,8 @@ void interface::chooseOperation() {
   std::cout << "8. Panorama / stitching" << std::endl;
   std::cout << "9. Canny edge detection" << std::endl;
   std::cout << "10. Remove backgound" << std::endl;
-  std::cout << "11. Quit" << std::endl;
+  std::cout << "11. Detect a face" << std::endl;
+  std::cout << "12. Quit" << std::endl;
 
   std::cout << "Choose an operation to perform : " << std::endl;
   std::cin >> chosen;
@@ -179,14 +181,70 @@ void interface::chooseOperation() {
     }
     case 10: {
 
+      int methode;
+
+      std::cout << "1. Foreground extraction" << std::endl;
+      std::cout << "2. Thresholding" << std::endl;
+      std::cout << "3. Chromakey" << std::endl;
+      std::cout << "What method would you like to use : ";
+      std::cin >> methode;
+
       backgroundRemover *bgRemover = new backgroundRemover(getCurrentImage());
-      setCurrentImage(bgRemover->chromaKey());
-      img->addImageToHistorique(getCurrentImage());
+
+      switch (methode) {
+        case 1: {
+          setCurrentImage(bgRemover->foregroundExtraction());
+          img->addImageToHistorique(getCurrentImage());
+          break;
+        }
+        case 2: {
+          setCurrentImage(bgRemover->thresholding());
+          img->addImageToHistorique(getCurrentImage());
+          break;
+        }
+        case 3: {
+          setCurrentImage(bgRemover->chromaKey());
+          img->addImageToHistorique(getCurrentImage());
+          break;
+        }
+        default:
+          break;
+      }
+
       delete bgRemover;
 
       break;
     }
-    case 11:
+    case 11: {
+
+      int choix;
+
+      std::cout << "1. Detect a face from the loaded image"<< std::endl;
+      std::cout << "2. Detect a face from the webcam"<< std::endl;
+
+      std::cin >> choix;
+      faceDetection *face_detection = new faceDetection();
+
+      switch (choix) {
+        case 1: {
+          setCurrentImage(face_detection->detectFromImage(getCurrentImage()));
+          img->addImageToHistorique(getCurrentImage());
+          break;
+        }
+        case 2: {
+          setCurrentImage(face_detection->detectFromWebcam());
+          img->addImageToHistorique(getCurrentImage());
+          break;
+        }
+        default:
+          break;
+      }
+
+      delete face_detection;
+
+      break;
+    }
+    case 12:
       std::exit(0);
       break;
     default:
