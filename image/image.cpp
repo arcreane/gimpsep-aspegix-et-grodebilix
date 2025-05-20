@@ -10,6 +10,11 @@ image::image(cv::Mat image) {
   historique.push_back(currentImage);
 }
 
+image::~image() {
+
+}
+
+
 cv::Mat image::getImage() {
   return currentImage;
 }

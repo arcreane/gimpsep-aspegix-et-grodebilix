@@ -3,6 +3,7 @@
 canny::canny() {};
 canny::~canny() {};
 
+
 cv::Mat canny::detectEdges(cv::Mat image) {
 
   bool cancel = false;

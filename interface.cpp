@@ -14,6 +14,11 @@ interface::interface(image* newImg) {
   //setCurrentImage(image);
 }
 
+interface::~interface() {
+
+}
+
+
 
 void interface::setCurrentImage(cv::Mat newImage) {
   img->setImage(newImage);

@@ -2,23 +2,37 @@
 #include "interface.h"
 #include "image/image.h"
 
-int main() {
+#include <QApplication>
+#include "MainWindow.h"
 
-    std::cout << "SUPER APPLICATION COMME GIMP" << std::endl; // Penser à un meilleur titre
+int main(int argc, char *argv[]) {
 
-    std::string imagePath;
+    bool gui = true;
 
-    std::cout << "Enter image path : ";
-    std::cin >> imagePath;
+    if (gui) {
+        QApplication app(argc, argv);
+        MainWindow window;
+        window.show();
+        return app.exec();
+    } else {
+        std::cout << "SUPER APPLICATION COMME GIMP" << std::endl; // Penser à un meilleur titre
 
-    image * img = new image(imagePath);
-    interface * inter = new interface(img);
+        std::string imagePath;
 
-    bool running = true;
-    while (running) {
-        inter->chooseOperation();
-        cv::waitKey(1);
+        std::cout << "Enter image path : ";
+        std::cin >> imagePath;
+
+        image * img = new image(imagePath);
+        interface * inter = new interface(img);
+
+        bool running = true;
+        while (running) {
+            inter->chooseOperation();
+            cv::waitKey(1);
+        }
     }
+
+
 
     return 0;
 }
