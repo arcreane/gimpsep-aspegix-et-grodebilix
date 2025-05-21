@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
 
-    bool gui = true;
+    bool gui = false;
 
     if (gui) {
         QApplication app(argc, argv);
