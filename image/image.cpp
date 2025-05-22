@@ -1,11 +1,13 @@
 #include "image.h"
 
 image::image(std::string path){
+  // On ouvre l'image à partir du chemin spécifié
   currentImage = cv::imread(path);
   historique.push_back(currentImage);
 }
 
 image::image(cv::Mat image) {
+  // Mise à jour de l'image
   currentImage = image;
   historique.push_back(currentImage);
 }
@@ -24,6 +26,7 @@ void image::addImageToHistorique(const cv::Mat& image) {
 
 
 void image::loadNewImage(const std::string& path) {
+  // Remplacer l'image actuelle avec une nouvelle image
   if (!currentImage.empty()) {
     historique.push_back(currentImage.clone());
   }
@@ -55,6 +58,7 @@ void image::showHistory() {
 
   cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
+  // Options pour le texte en bas à droite
   int font = cv::FONT_HERSHEY_SIMPLEX;
   double fontScale = 1.0;
   int thickness = 1;
@@ -63,11 +67,13 @@ void image::showHistory() {
   while (true) {
 
 
-    // On frait une copie pour pas rajouter du texte sur l'image pour de vrai
+    // On fait une copie pour pas rajouter du texte sur l'image pour de vrai
     cv::Mat displayImage = historique[index].clone();
 
+    // Le texte qu'on affiche
     std::string text = std::to_string(index + 1) + " / " + std::to_string(total);
 
+    // Taille du texte
     int baseline = 0;
     cv::Size textSize = cv::getTextSize(text, font, fontScale, thickness, &baseline);
 
@@ -80,6 +86,7 @@ void image::showHistory() {
     // Texte en blanc
     cv::putText(displayImage, text, textOrg, font, fontScale, cv::Scalar(255, 255, 255), thickness);
 
+    // Affichage de l'image
     cv::imshow(windowName, displayImage);
 
     // Visiblement les flèches ça marche pas trop donc j'ai mis Q et D
@@ -95,6 +102,7 @@ void image::showHistory() {
 
   }
 
+  // Fermeture de la fenêtre
   cv::destroyWindow(windowName);
 
 }
@@ -105,6 +113,7 @@ void image::restoreToVersion(int version) {
     return;
   }
 
+  // On remet une ancienne vesrion de l'image
   cv::Mat temp = currentImage;
   currentImage = historique[version] - 1;
   historique.push_back(temp);

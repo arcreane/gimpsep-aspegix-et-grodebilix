@@ -45,31 +45,36 @@ cv::Mat resize::resizeAndShow(const cv::Mat& source) {
         cv::resize(source, resized, Size(width, height));
     }
     else {
-        cerr << "Paramètres invalides pour le redimensionnement." << endl;
+        cerr << "Paramï¿½tres invalides pour le redimensionnement." << endl;
         return Mat();
     }
 
-    namedWindow("Image Originale", WINDOW_NORMAL);
-    namedWindow("Image Redimensionnée", WINDOW_NORMAL);
+    std::string windowNameOg = "Image Originale";
+    std::string windowNameNew = "Image Redimensionnï¿½e";
 
-    imshow("Image Originale", source);
-    imshow("Image Redimensionnée", resized);
+    namedWindow(windowNameOg, WINDOW_NORMAL);
+    namedWindow(windowNameNew, WINDOW_NORMAL);
+
+    imshow(windowNameOg, source);
+    imshow(windowNameNew, resized);
 
     cout << "\nAppuyez sur 'Echap' sur une image pour quitter\n";
 
     while (true) {
         int key = waitKey(1);
         if (key == 27) {
-            destroyAllWindows();
-            return resized;
+            break;
         }
     }
+    destroyWindow(windowNameOg);
+    destroyWindow(windowNameNew);
+
     return resized;
 }
 
 cv::Mat resize::apply(const cv::Mat& input) {
     if (!getParameters(input)) {
-        return cv::Mat();  // Annulé
+        return cv::Mat();  // Annulï¿½
     }
     return resizeAndShow(input);
 }
