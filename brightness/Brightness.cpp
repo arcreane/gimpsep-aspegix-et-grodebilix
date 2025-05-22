@@ -7,7 +7,7 @@ using namespace cv;
 brightness::brightness() : mode(0), value(0) {}
 
 bool brightness::getParameters() {
-    cout << "\n=== Modification de la luminosité ===" << endl;
+    cout << "\n=== Modification de la luminositï¿½ ===" << endl;
     cout << "1. Rendre l'image plus lumineuse" << endl;
     cout << "2. Rendre l'image plus sombre" << endl;
     cout << "Votre choix : ";
@@ -18,7 +18,7 @@ bool brightness::getParameters() {
         return false;
     }
 
-    cout << "Entrez la valeur de luminosité [0 - 100] : ";
+    cout << "Entrez la valeur de luminositï¿½ [0 - 100] : ";
     cin >> value;
 
     if (value < 0 || value > 100) {
@@ -40,21 +40,25 @@ cv::Mat brightness::changeAndShow(const cv::Mat& image) {
         result = result * (1.0 - factor);
     }
 
-    namedWindow("Image Originale", WINDOW_NORMAL);
-    namedWindow("Image Modifiée", WINDOW_NORMAL);
+    std::string windowNameOg = "Image Originale";
+    std::string windowNameNew = "Image Redimensionnï¿½e";
 
-    imshow("Image Originale", image);
-    imshow("Image Modifiée", result);
+    namedWindow(windowNameOg, WINDOW_NORMAL);
+    namedWindow(windowNameNew, WINDOW_NORMAL);
+
+    imshow(windowNameOg, image);
+    imshow(windowNameNew, result);
 
     cout << "\nAppuyez sur 'Echap' sur une image pour quitter\n";
 
     while (true) {
         int key = waitKey(1);
         if (key == 27) {
-            destroyAllWindows();
-            return result;
+            break;
         }
     }
+    destroyWindow(windowNameOg);
+    destroyWindow(windowNameNew);
     return result;
 }
 

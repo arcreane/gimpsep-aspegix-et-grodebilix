@@ -79,6 +79,7 @@ cv::Mat backgroundRemover::thresholding() {
 void backgroundRemover::onMouse(int event, int x, int y, int, void* userdata) {
   if (event != cv::EVENT_LBUTTONDOWN) return;
 
+  // On trouve la couleur à l'emplacement de la sourie
   backgroundRemover* self = static_cast<backgroundRemover*>(userdata);
   self->selectedColor = self->image.at<cv::Vec3b>(y, x);
   self->colorSelected = true;
