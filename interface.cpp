@@ -1,8 +1,8 @@
 #include "interface.h"
 #include "erosion/erosion.h"
 #include "canny/canny.h"
-#include "brightness/Brightness.hpp"
-#include "resize/Resize_Image.hpp"
+#include "brightness/brightness.h"
+#include "resize/resize.h"
 #include "panorama/panorama.h"
 #include "remove-background/backgroundRemover.h"
 #include "face-detection/faceDetection.h"
@@ -132,33 +132,23 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 6:
-      // TODO : refacto resize pour l'intégrer là dedans
-      break;
+    case 6: {
+        resize size;
+        cv::Mat result = size.apply(getCurrentImage());
+        if (!result.empty()) {
+            setCurrentImage(result);
+            img->addImageToHistorique(result);
+        }
+        break;
+    }
     case 7: {
-      // TODO: refacto lighten / darken pour l'intégrer là dedans
-
-      int choix;
-
-      std::cout << "1. Rendre l'image plus lumineuse" << std::endl;
-      std::cout << "2. Rendre l'image plus sombre" << std::endl;
-
-      std::cin >> choix;
-
-      switch (choix) {
-
-        case 1: {
-          break;
+        brightness bright;
+        cv::Mat result = bright.apply(getCurrentImage());
+        if (!result.empty()) {
+            setCurrentImage(result);
+            img->addImageToHistorique(result);
         }
-
-        case 2: {
-          break;
-        }
-
-        default:
-          break;
-      }
-      break;
+        break;
     }
     case 8: {
 
