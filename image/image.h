@@ -19,7 +19,9 @@ class image {
     cv::Mat getImage();
     void setImage(cv::Mat image);
     void loadNewImage(const std::string &path);
+    cv::Mat loadImageFromWebcam();
     void addImageToHistorique(const cv::Mat &image);
+    void saveImage();
     void undo();
     void showHistory();
     void restoreToVersion(int version);

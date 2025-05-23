@@ -49,37 +49,41 @@ void interface::chooseOperation() {
 
   std::cout << "--- GESTION DE L'IMAGE ---" << std::endl;
   std::cout << "1. Load and image with it's path" << std::endl;
-  std::cout << "2. Show the current image" << std::endl;
-  std::cout << "3. Afficher l'historique des modifications" << std::endl;
-  std::cout << "4. Restaurer une ancienne version de l'image" << std::endl;
+  std::cout << "2. Load image from the webcam" << std::endl;
+  std::cout << "3. Show the current image" << std::endl;
+  std::cout << "4. Afficher l'historique des modifications" << std::endl;
+  std::cout << "5. Restaurer une ancienne version de l'image" << std::endl;
+  std::cout << "6. Save image to file" << std::endl;
   std::cout << "--- OPERATIONS SUR L'IMAGE ---" << std::endl;
-  std::cout << "5. Dilatation / Erosion" << std::endl;
-  std::cout << "6. Resize" << std::endl;
-  std::cout << "7. Lighten / Darken" << std::endl;
-  std::cout << "8. Panorama / stitching" << std::endl;
-  std::cout << "9. Canny edge detection" << std::endl;
-  std::cout << "10. Remove backgound" << std::endl;
-  std::cout << "11. Detect a face" << std::endl;
-  std::cout << "12. Quit" << std::endl;
+  std::cout << "7. Dilatation / Erosion" << std::endl;
+  std::cout << "8. Resize" << std::endl;
+  std::cout << "9. Lighten / Darken" << std::endl;
+  std::cout << "10. Panorama / stitching" << std::endl;
+  std::cout << "11. Canny edge detection" << std::endl;
+  std::cout << "12. Remove backgound" << std::endl;
+  std::cout << "13. Detect a face" << std::endl;
+  std::cout << "14. Quit" << std::endl;
 
   std::cout << "Choose an operation to perform : " << std::endl;
   std::cin >> chosen;
 
   switch (chosen) {
     case 1:
-
       std::cout << "Enter the path of the image you wish to edit : ";
       std::cin >> path;
       loadNewImage(path);
       break;
-    case 2:
+    case 2 : {
+      setCurrentImage(img->loadImageFromWebcam());
+    }
+    case 3:
       showCurrentImage();
       break;
-    case 3: {
+    case 4: {
       img->showHistory();
       break;
     }
-    case 4: {
+    case 5: {
 
       int version;
       std::cout << "Quelle version de l'image voulez vous restaurer :";
@@ -87,7 +91,12 @@ void interface::chooseOperation() {
       img->restoreToVersion(version);
       break;
     }
-    case 5 : {
+    case 6: {
+
+      img->saveImage();
+      break;
+    }
+    case 7 : {
 
       int option;
       std::cout << "1. Grayscale erosion" << std::endl;
@@ -132,7 +141,7 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 6: {
+    case 8: {
         resize size;
         cv::Mat result = size.apply(getCurrentImage());
         if (!result.empty()) {
@@ -141,7 +150,7 @@ void interface::chooseOperation() {
         }
         break;
     }
-    case 7: {
+    case 9: {
         brightness bright;
         cv::Mat result = bright.apply(getCurrentImage());
         if (!result.empty()) {
@@ -150,7 +159,7 @@ void interface::chooseOperation() {
         }
         break;
     }
-    case 8: {
+    case 10: {
 
       panorama *pan = new panorama(getCurrentImage());
 
@@ -160,7 +169,7 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 9: {
+    case 11: {
 
       canny *can = new canny();
       setCurrentImage(can->detectEdges(getCurrentImage()));
@@ -169,7 +178,7 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 10: {
+    case 12: {
 
       int methode;
 
@@ -205,7 +214,7 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 11: {
+    case 13: {
 
       int choix;
 
@@ -234,7 +243,7 @@ void interface::chooseOperation() {
 
       break;
     }
-    case 12:
+    case 14:
       std::exit(0);
       break;
     default:

@@ -1,4 +1,5 @@
 #include "image.h"
+#include <filesystem>
 
 image::image(std::string path){
   // On ouvre l'image à partir du chemin spécifié
@@ -115,6 +116,63 @@ void image::restoreToVersion(int version) {
 
   // On remet une ancienne vesrion de l'image
   cv::Mat temp = currentImage;
-  currentImage = historique[version] - 1;
+  currentImage = historique[version - 1];
   historique.push_back(temp);
+}
+
+cv::Mat image::loadImageFromWebcam() {
+
+  cv::Mat result;
+
+  cv::VideoCapture cap = cv::VideoCapture(0);
+
+  if (!cap.isOpened()) {
+    return result;
+  }
+
+  std::string windowName = "Webcam";
+  cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+
+  while (true) {
+
+    cv::Mat frame;
+
+    cap >> frame;
+
+    imshow(windowName, frame);
+
+    int key = cv::waitKey(1);
+    if (key == 27 || key == 13 || key == 10) {
+      result = frame.clone();
+      break;
+    }
+
+  }
+
+  cap.release();
+  cv::destroyWindow(windowName);
+
+  return result;
+
+}
+
+void image::saveImage() {
+  std::string basePath = "./output/output";
+  std::string extension = ".png";
+  std::string savePath = basePath + extension;
+  int version = 1;
+
+  // On vérifie que y'a pas déjà un ficiher qui s'appelle comme ça
+  // Sinon on rajoute un chiffre derrière comme dans les explorateurs de fichiers
+  while (std::filesystem::exists(savePath)) {
+    savePath = basePath + "_" + std::to_string(version) + extension;
+    version++;
+  }
+
+  // Enregistrement de l'image
+  if (cv::imwrite(savePath, getImage())) {
+    std::cout << "Image saved to " << savePath << std::endl;
+  } else {
+    std::cerr << "Could not save image." << std::endl;
+  }
 }
