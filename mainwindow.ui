@@ -6,8 +6,8 @@
             <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>400</width>
-                <height>300</height>
+                <width>800</width>
+                <height>700</height>
             </rect>
         </property>
         <widget class="QWidget" name="centralwidget">
@@ -20,9 +20,9 @@
                     </widget>
                 </item>
                 <item>
-                    <widget class="QPushButton" name="erosionButton">
+                    <widget class="QPushButton" name="saveButton">
                         <property name="text">
-                            <string>Grayscale Erosion</string>
+                            <string>Save Image</string>
                         </property>
                     </widget>
                 </item>

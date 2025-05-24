@@ -20,6 +20,8 @@ public:
     private slots:
         void onLoadImage();
 
+    void onSaveImage();
+
     void onApplyErosionGrayScale();
 
     void onApplyErosionColor();

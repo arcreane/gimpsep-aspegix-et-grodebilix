@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(openAction, &QAction::triggered, this, &MainWindow::onLoadImage);
 
     connect(ui->loadButton, &QPushButton::clicked, this, &MainWindow::onLoadImage);
-    connect(ui->erosionButton, &QPushButton::clicked, this, &MainWindow::onApplyErosionGrayScale);
+    connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::onSaveImage);
 }
 
 MainWindow::~MainWindow() {
@@ -119,6 +119,22 @@ void MainWindow::onLoadImage() {
         iface = new interface(img);
 
         showImage(img->getImage());
+    }
+}
+
+void MainWindow::onSaveImage() {
+    QString fileName = QFileDialog::getSaveFileName(this, "Save Image", "", "Images (*.png *.jpg *.bmp)");
+
+    if (fileName.isEmpty()) {
+        return; // User cancelled
+    }
+
+    std::string stdFileName = fileName.toStdString();
+
+    if (!cv::imwrite(stdFileName, img->getImage())) {
+        std::cout << "Failed to save image." << std::endl;
+    } else {
+        std::cout << "Image saved." << std::endl;
     }
 }
 
