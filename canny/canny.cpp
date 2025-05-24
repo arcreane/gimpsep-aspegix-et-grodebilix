@@ -8,12 +8,13 @@ cv::Mat canny::detectEdges(cv::Mat image) {
 
   bool cancel = false;
 
+  // Création de la fenêtre
   std::string windowName = "Edge detection";
   cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
-
-  int lowThreshold = 0;
-  int highThreshold = 0;
+  // Création des trackbars
+  int lowThreshold = 50;
+  int highThreshold = 150;
   cv::createTrackbar("Low threshold", windowName, &lowThreshold, 500, 0, 0);
   cv::createTrackbar("High threshold", windowName, &highThreshold, 500, 0, 0);
 
@@ -24,8 +25,6 @@ cv::Mat canny::detectEdges(cv::Mat image) {
   } else {
     gray = image;
   }
-
-
 
 
   // Si on rajoute du flou ça rends plus clean sur certaines images mais on perds du détail
@@ -42,6 +41,7 @@ cv::Mat canny::detectEdges(cv::Mat image) {
     // Affichage de l'image
     cv::imshow(windowName, edges);
 
+    // On attends l'input de l'utilisateur
     int key = cv::waitKey(10);
 
     //ESC
@@ -56,6 +56,7 @@ cv::Mat canny::detectEdges(cv::Mat image) {
     }
   }
 
+  // Fermeture de la fenêtre
   cv::destroyWindow(windowName);
 
   if (cancel) {

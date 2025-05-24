@@ -66,10 +66,8 @@ cv::Mat resize::resizeAndShow(const cv::Mat& source) {
             break;
         }
     }
-
     destroyWindow(windowNameOg);
     destroyWindow(windowNameNew);
-
 
     return resized;
 }

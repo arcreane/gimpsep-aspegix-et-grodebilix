@@ -12,6 +12,8 @@ cv::Mat faceDetection::detectFromImage(cv::Mat image) {
 
   cv::Mat backup = image.clone();
 
+  // On crée une copie en noir et blanc
+  // Vérif de sécurité pour éviter les bugs quand veux transformer une image noir & blanc en noir & blanc
   cv::Mat gray;
   if (image.channels() == 3) {
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
@@ -22,20 +24,26 @@ cv::Mat faceDetection::detectFromImage(cv::Mat image) {
   // Askip c'est mieux pour le contrast
   cv::equalizeHist(gray, gray);
 
+  // Liste des visages détectés
   std::vector<cv::Rect> faces;
   faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, cv::Size(30, 30));
 
+  // Rectangle qu'on affiche autour d'un visage
   for (const auto& face : faces) {
         cv::rectangle(image, face, cv::Scalar(255, 0, 0), 2);
   }
 
+  // Création de la fenêtre
   std::string windowName = "FaceDetection";
   cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
+  // Affichage de l'image
   cv::imshow(windowName, image);
 
+  // Attente de l'input de l'utilisateur
   cv::waitKey(0);
 
+  // Fermer la fenêtre
   cv::destroyWindow(windowName);
 
   return image;
@@ -47,7 +55,7 @@ cv::Mat faceDetection::detectFromWebcam() {
 
   cv::VideoCapture cap = cv::VideoCapture(0);
 
-  // Check if camera opened successfully
+  // Vérifier que la caméra est ouverte
   if(!cap.isOpened()){
     std::cout << "Error opening video stream or file" << std::endl;
   }
@@ -78,9 +86,11 @@ cv::Mat faceDetection::detectFromWebcam() {
       // Askip c'est mieux pour le contrast
       cv::equalizeHist(gray, gray);
 
+      // Création de la liste des visages détectés (les rectangles autours mais c'est pareil sayez là)
       std::vector<cv::Rect> faces;
       faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, cv::Size(30, 30));
 
+      // Rectangles autour des visages
       for (const auto& face : faces) {
         cv::rectangle(frame, face, cv::Scalar(255, 0, 0), 2);
       }
@@ -97,6 +107,7 @@ cv::Mat faceDetection::detectFromWebcam() {
 
   }
 
+  // Fermeture de la fenêtre
   cv::destroyWindow(windowName);
 
   return result;

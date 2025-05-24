@@ -56,8 +56,10 @@ cv::Mat erosion::erodeGrayScale(cv::Mat image) {
 
   }
 
+  // Fermeture de la fenêtre
   cv::destroyWindow(windowName);
 
+  // On annule les modifications
   if (cancel) {
     return image;
   }
@@ -84,7 +86,9 @@ cv::Mat erosion::erodeColor(cv::Mat image) {
 
   while (true) {
 
+    // Création du kernel
     kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(2 * erosionSize + 1, 2 * erosionSize + 1));
+    // Erosion
     cv::erode(image, eroodedColor, kernel);
     cv::imshow(windowName, eroodedColor);
 
@@ -102,8 +106,10 @@ cv::Mat erosion::erodeColor(cv::Mat image) {
     }
   }
 
+  // Fermeture de la fenêtre
   cv::destroyWindow(windowName);
 
+  // On annule les modifications
   if (cancel) {
     return image;
   }
@@ -138,6 +144,7 @@ cv::Mat erosion::dilateGrayScale(cv::Mat image) {
 
   cv::Mat element;
   cv::Mat dilated;
+
   while (true) {
 
     // Dilatation
@@ -147,6 +154,7 @@ cv::Mat erosion::dilateGrayScale(cv::Mat image) {
     // Affichage de l'image
     cv::imshow(windowName, dilated);
 
+    // On attends l'input de l'utilisateur
     int key = cv::waitKey(10);
 
     //ESC
@@ -162,8 +170,10 @@ cv::Mat erosion::dilateGrayScale(cv::Mat image) {
 
   }
 
+  // Fermeture de le fenêtre
   cv::destroyWindow(windowName);
 
+  // On annule les modifications
   if (cancel) {
     return image;
   }
@@ -209,8 +219,10 @@ cv::Mat erosion::dilateColor(cv::Mat image) {
 
   }
 
+  // Fermeture de la fenêtre
   cv::destroyWindow(windowName);
 
+  // On annule les modifications
   if (cancel) {
     return image;
   }
