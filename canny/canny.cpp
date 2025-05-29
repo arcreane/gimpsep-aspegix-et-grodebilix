@@ -66,3 +66,20 @@ cv::Mat canny::detectEdges(cv::Mat image) {
   return edges;
 
 }
+
+cv::Mat canny::detectEdgesGUI(cv::Mat image, int lowThreshold = 50, int highThreshold = 150) {
+
+  cv::Mat gray;
+  if (image.channels() == 3) {
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  } else {
+    gray = image;
+  }
+
+  cv::Mat edges;
+
+  cv::Canny(gray, edges, lowThreshold, highThreshold);
+
+  return edges;
+
+}

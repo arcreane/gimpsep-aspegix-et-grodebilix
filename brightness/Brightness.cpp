@@ -68,3 +68,19 @@ cv::Mat brightness::apply(const cv::Mat& image) {
     }
     return changeAndShow(image);
 }
+
+
+cv::Mat brightness::changeAndShowGUI(const cv::Mat& image, int mode, int value) {
+    if (mode != 1 && mode != 2) return image.clone();
+
+    Mat result = image.clone();
+    double factor = value / 100.0;
+
+    if (mode == 1) {
+        result += Scalar(255 * factor, 255 * factor, 255 * factor);
+    }
+    else if (mode == 2) {
+        result = result * (1.0 - factor);
+    }
+    return result;
+}

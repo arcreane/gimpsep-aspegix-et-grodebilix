@@ -1,5 +1,7 @@
 #include "backgroundRemover.h"
 
+#include <qcolor.h>
+
 backgroundRemover::backgroundRemover(cv::Mat img) {
   image = img.clone();
 }
@@ -130,3 +132,130 @@ cv::Mat backgroundRemover::chromaKey() {
   return result;
 
 }
+
+cv::Mat backgroundRemover::backgroundRemoverGUI(int mode, int thresholdValue, int hTolerance, int sTolerance, int vTolerance) {
+  cv::Mat result;
+
+  if (mode == 0) {  // Foreground extraction
+    result = foregroundExtraction();
+
+  } else if (mode == 1) {  // Thresholding
+    cv::Mat gray, binary;
+    if (image.channels() == 3) {
+      cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+    } else {
+      gray = image;
+    }
+    cv::threshold(gray, binary, thresholdValue, 255, cv::THRESH_BINARY_INV);
+
+    result = cv::Mat(image.size(), image.type(), cv::Scalar(0, 0, 0));
+    image.copyTo(result, binary);
+
+  } else if (mode == 2) {  // Chroma key
+    if (!colorSelected) {
+      // fallback: no color picked yet, return original
+      return image;
+    }
+
+    cv::Mat selected(1, 1, CV_8UC3, selectedColor);
+    cv::Mat selectedHSV;
+    cv::cvtColor(selected, selectedHSV, cv::COLOR_BGR2HSV);
+    cv::Vec3b targetHSV = selectedHSV.at<cv::Vec3b>(0, 0);
+
+    cv::Scalar lower(targetHSV[0] - hTolerance, std::max(0, targetHSV[1] - sTolerance), std::max(0, targetHSV[2] - vTolerance));
+    cv::Scalar upper(targetHSV[0] + hTolerance, std::min(255, targetHSV[1] + sTolerance), std::min(255, targetHSV[2] + vTolerance));
+
+    cv::Mat hsvImg;
+    cv::cvtColor(image, hsvImg, cv::COLOR_BGR2HSV);
+    cv::Mat mask;
+    cv::inRange(hsvImg, lower, upper, mask);
+
+    cv::Mat invertedMask;
+    cv::bitwise_not(mask, invertedMask);
+
+    result = cv::Mat(image.size(), image.type(), cv::Scalar(0, 0, 0));
+    image.copyTo(result, invertedMask);
+  }
+
+  return result;
+}
+
+// cv::Mat backgroundRemover::chromaKeyGUI(QColor qcolor, int hTolerance, int sTolerance, int vTolerance) {
+//   cv::Mat img = image.clone();
+//
+//   cv::Mat selected(1, 1, CV_8UC3, cv::Vec3b(qcolor.blue(), qcolor.green(), qcolor.red()));  // Qt uses RGB, OpenCV uses BGR
+//   cv::Mat selectedHSV;
+//   cv::cvtColor(selected, selectedHSV, cv::COLOR_BGR2HSV);
+//   cv::Vec3b targetHSV = selectedHSV.at<cv::Vec3b>(0, 0);
+//
+//   cv::Scalar lower(targetHSV[0] - hTolerance, std::max(0, targetHSV[1] - sTolerance), std::max(0, targetHSV[2] - vTolerance));
+//   cv::Scalar upper(targetHSV[0] + hTolerance, std::min(255, targetHSV[1] + sTolerance), std::min(255, targetHSV[2] + vTolerance));
+//
+//   cv::Mat hsvImg;
+//   cv::cvtColor(img, hsvImg, cv::COLOR_BGR2HSV);
+//   cv::Mat mask;
+//   cv::inRange(hsvImg, lower, upper, mask);
+//
+//   cv::Mat result(image.size(), image.type(), cv::Scalar(0, 0, 0));
+//   cv::Mat invertedMask;
+//   cv::bitwise_not(mask, invertedMask);
+//   image.copyTo(result, invertedMask);
+//
+//   return result;
+// }
+
+
+// In backgroundRemover.cpp (implementations)
+
+// Thresholding that uses a slider value, no GUI window or waitKey
+cv::Mat backgroundRemover::thresholdingGUI(int threshold) {
+  cv::Mat gray, binary;
+
+  if (image.channels() == 3) {
+    cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  } else {
+    gray = image;
+  }
+
+  cv::threshold(gray, binary, threshold, 255, cv::THRESH_BINARY_INV);
+
+  cv::Mat foreground;
+  image.copyTo(foreground, binary);
+
+  return foreground;
+}
+
+// Chroma key using selected QColor and HSV tolerances
+cv::Mat backgroundRemover::chromaKeyGUI(QColor qcolor, int hTolerance, int sTolerance, int vTolerance) {
+  cv::Mat img = image.clone();
+
+  // Convert QColor (RGB) to OpenCV BGR order
+  cv::Vec3b bgrPixel(qcolor.blue(), qcolor.green(), qcolor.red());
+
+  cv::Mat selected(1, 1, CV_8UC3, bgrPixel);
+  cv::Mat selectedHSV;
+  cv::cvtColor(selected, selectedHSV, cv::COLOR_BGR2HSV);
+  cv::Vec3b targetHSV = selectedHSV.at<cv::Vec3b>(0, 0);
+
+  cv::Scalar lower(std::max(0, targetHSV[0] - hTolerance),
+                   std::max(0, targetHSV[1] - sTolerance),
+                   std::max(0, targetHSV[2] - vTolerance));
+  cv::Scalar upper(std::min(255, targetHSV[0] + hTolerance),
+                   std::min(255, targetHSV[1] + sTolerance),
+                   std::min(255, targetHSV[2] + vTolerance));
+
+  cv::Mat hsvImg;
+  cv::cvtColor(img, hsvImg, cv::COLOR_BGR2HSV);
+
+  cv::Mat mask;
+  cv::inRange(hsvImg, lower, upper, mask);
+
+  cv::Mat result(image.size(), image.type(), cv::Scalar(0, 0, 0));
+  cv::Mat invertedMask;
+  cv::bitwise_not(mask, invertedMask);
+  image.copyTo(result, invertedMask);
+
+  return result;
+}
+
+

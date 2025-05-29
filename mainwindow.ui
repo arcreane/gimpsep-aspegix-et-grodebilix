@@ -1,43 +1,180 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>MainWindow</class>
-    <widget class="QMainWindow" name="MainWindow">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>800</width>
-                <height>700</height>
-            </rect>
-        </property>
-        <widget class="QWidget" name="centralwidget">
-            <layout class="QVBoxLayout" name="verticalLayout">
-                <item>
-                    <widget class="QPushButton" name="loadButton">
-                        <property name="text">
-                            <string>Load Image</string>
-                        </property>
-                    </widget>
-                </item>
-                <item>
-                    <widget class="QPushButton" name="saveButton">
-                        <property name="text">
-                            <string>Save Image</string>
-                        </property>
-                    </widget>
-                </item>
-                <item>
-                    <widget class="QLabel" name="imageLabel">
-                        <property name="text">
-                            <string/>
-                        </property>
-                    </widget>
-                </item>
-            </layout>
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <!-- Sidebar with fixed width -->
+    <item>
+     <widget class="QWidget" name="sidebarWidget">
+      <property name="minimumSize">
+       <size>
+        <width>60</width>
+        <height>0</height>
+       </size>
+      </property>
+      <layout class="QVBoxLayout" name="sidebarLayout">
+       <item>
+        <widget class="QToolButton" name="brightnessButton">
+         <property name="toolTip">
+          <string>Brightness</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::WeatherClear"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
         </widget>
-        <widget class="QMenuBar" name="menubar"/>
-        <widget class="QStatusBar" name="statusbar"/>
-    </widget>
-    <resources/>
-    <connections/>
+       </item>
+       <item>
+        <widget class="QToolButton" name="resizeButton">
+         <property name="toolTip">
+          <string>Resize</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::ViewFullscreen"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="cannyButton">
+         <property name="toolTip">
+          <string>Canny</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::WeatherStorm"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="erosionButton">
+         <property name="toolTip">
+          <string>Erosion</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::ProcessStop"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="dilationButton">
+         <property name="toolTip">
+          <string>Dilation</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::EditFind"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="panoramaButton">
+         <property name="toolTip">
+          <string>Panorama</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::InsertImage"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="faceDetectionButton">
+         <property name="toolTip">
+          <string>Face detection</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::CameraWeb"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="backgroundRemoverButton">
+         <property name="toolTip">
+          <string>Background remover</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonIconOnly</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <!-- Main area with stretch -->
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="stretch">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="loadButton">
+        <property name="text">
+         <string>Load Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="saveButton">
+        <property name="text">
+         <string>Save Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="imageLabel">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>37</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

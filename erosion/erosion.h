@@ -14,6 +14,8 @@ public:
 
     cv::Mat erodeColor(cv::Mat image);
 
+    cv::Mat erodeGUI(cv::Mat image, int size, int mode);
+
     cv::Mat dilateGrayScale(cv::Mat image);
 
     cv::Mat dilateColor(cv::Mat image);

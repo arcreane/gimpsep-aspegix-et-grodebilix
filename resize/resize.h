@@ -3,22 +3,25 @@
 
 #include <opencv2/opencv.hpp>
 
-class resize {
-private:
-    double scaleFactor;
-    int width;
-    int height;
+namespace gimpsep {
+    class resize {
+    private:
+        double scaleFactor;
+        int width;
+        int height;
 
-public:
-    resize();
+    public:
+        resize();
 
-    // Demande à l'utilisateur les paramètres de redimensionnement
-    bool getParameters(const cv::Mat& source);
+        // Demande ï¿½ l'utilisateur les paramï¿½tres de redimensionnement
+        bool getParameters(const cv::Mat& source);
 
-    // Applique le redimensionnement sur l'image d'origine
-    cv::Mat resizeAndShow(const cv::Mat& source);
+        // Applique le redimensionnement sur l'image d'origine
+        cv::Mat resizeAndShow(const cv::Mat& source);
 
-    cv::Mat apply(const cv::Mat& input);
-};
+        cv::Mat apply(const cv::Mat& input);
 
+        cv::Mat resizeAndShowGUI(const cv::Mat &source, bool byFactor, double scaleFactor, int width, int height);
+    };
+}
 #endif 

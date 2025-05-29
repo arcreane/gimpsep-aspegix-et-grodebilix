@@ -8,6 +8,8 @@ class canny {
       canny();
       ~canny();
       cv::Mat detectEdges(cv::Mat image);
+
+      cv::Mat detectEdgesGUI(cv::Mat image, int lowThreshold, int highThreshold);
 };
 
 

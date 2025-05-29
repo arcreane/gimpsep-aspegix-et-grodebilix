@@ -15,7 +15,7 @@ class panorama {
         void addImage(cv::Mat image);
         cv::Mat stitchImages();
 
-
+        cv::Mat stitchImagesGUI();
 };
 
 

@@ -6,19 +6,21 @@
 class brightness {
 private:
     int mode;   // 1 = lumineux, 2 = sombre
-    int value;  // valeur de luminosité [0-100]
+    int value;  // valeur de luminositï¿½ [0-100]
 
 public:
     brightness();
 
-    // Demande à l'utilisateur le mode et la valeur
+    // Demande ï¿½ l'utilisateur le mode et la valeur
     bool getParameters();
 
-    // Applique la luminosité sur une image et affiche le résultat
+    // Applique la luminositï¿½ sur une image et affiche le rï¿½sultat
     cv::Mat changeAndShow(const cv::Mat& image);
 
-    // Méthode unique pour l'interface
+    // Mï¿½thode unique pour l'interface
     cv::Mat apply(const cv::Mat& image);
+
+    cv::Mat changeAndShowGUI(const cv::Mat &image, int mode, int value);
 };
 
 #endif

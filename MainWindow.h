@@ -20,11 +20,15 @@ public:
     private slots:
         void onLoadImage();
 
+    void openParameterDialog();
+
     void onSaveImage();
 
     void onApplyErosionGrayScale();
 
     void onApplyErosionColor();
+
+    void onApplyErosion();
 
     void onApplyDilatationColor();
 
@@ -32,19 +36,29 @@ public:
 
     void onApplyForegroundExtraction();
 
+    void onApplyBackgroundRemoval();
+
     void onApplyThresholding();
 
     void onApplyChromaKey();
 
+    void onApplyResize();
+
     // void onApplyResize();
 
     void onApplyBrighten();
+
+    void onApplyBrightness();
 
     void onApplyCanny();
 
     void onDetectFaceFromImage();
 
     void onDetectFaceFromWebcam();
+
+    void onApplyFaceDetection();
+
+    void onApplyPanorama();
 
 private:
     Ui::MainWindow *ui;

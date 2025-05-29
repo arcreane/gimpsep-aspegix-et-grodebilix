@@ -112,3 +112,26 @@ cv::Mat faceDetection::detectFromWebcam() {
 
   return result;
 }
+
+cv::Mat faceDetection::detectFacesGUI(cv::Mat image) {
+  cv::Mat result = image.clone();
+
+  cv::Mat gray;
+  if (result.channels() == 3) {
+    cv::cvtColor(result, gray, cv::COLOR_BGR2GRAY);
+  } else {
+    gray = result;
+  }
+
+  cv::equalizeHist(gray, gray);
+
+  std::vector<cv::Rect> faces;
+  faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, cv::Size(30, 30));
+
+  for (const auto& face : faces) {
+    cv::rectangle(result, face, cv::Scalar(255, 0, 0), 2);
+  }
+
+  return result;
+}
+

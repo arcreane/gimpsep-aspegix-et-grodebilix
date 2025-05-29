@@ -118,6 +118,59 @@ cv::Mat erosion::erodeColor(cv::Mat image) {
 
 }
 
+cv::Mat erosion::erodeGUI(cv::Mat image, int size, int mode) {
+  cv::Mat output;
+
+  // Ensure size is non-negative
+  int kernelSize = std::max(0, size);
+  cv::Mat element = cv::getStructuringElement(
+      cv::MORPH_RECT,
+      cv::Size(2 * kernelSize + 1, 2 * kernelSize + 1),
+      cv::Point(kernelSize, kernelSize)
+  );
+
+  switch (mode) {
+    case 0: { // Grayscale erosion
+      cv::Mat gray, binary;
+      if (image.channels() == 3) {
+        cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+      } else {
+        gray = image;
+      }
+      cv::threshold(gray, binary, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+      cv::erode(binary, output, element);
+      break;
+    }
+    case 1: { // Color erosion
+      cv::erode(image, output, element);
+      break;
+    }
+    case 2: { // Grayscale dilation
+      cv::Mat gray, binary;
+      if (image.channels() == 3) {
+        cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+      } else {
+        gray = image;
+      }
+      cv::threshold(gray, binary, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+      cv::dilate(binary, output, element);
+      break;
+    }
+    case 3: { // Color dilation
+      cv::dilate(image, output, element);
+      break;
+    }
+    default: {
+      // Invalid mode: return original
+      output = image.clone();
+      break;
+    }
+  }
+
+  return output;
+}
+
+
 cv::Mat erosion::dilateGrayScale(cv::Mat image) {
 
   bool cancel = false;

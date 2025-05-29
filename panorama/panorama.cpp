@@ -59,3 +59,22 @@ cv::Mat panorama::stitchImages() {
     return result;
 
 }
+
+cv::Mat panorama::stitchImagesGUI() {
+    cv::Mat result;
+
+    if (images.size() < 2) {
+        std::cerr << "Need at least two images to stitch." << std::endl;
+        return result;
+    }
+
+    cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(cv::Stitcher::PANORAMA);
+    cv::Stitcher::Status status = stitcher->stitch(images, result);
+
+    if (status != cv::Stitcher::OK) {
+        std::cerr << "Can't stitch images, error code = " << int(status) << std::endl;
+        return cv::Mat();  // Return empty on failure
+    }
+
+    return result;
+}

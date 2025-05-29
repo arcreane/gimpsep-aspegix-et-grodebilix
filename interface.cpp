@@ -138,7 +138,7 @@ void interface::chooseOperation() {
       break;
     }
     case 6: {
-        resize size;
+        gimpsep::resize size;
         cv::Mat result = size.apply(getCurrentImage());
         if (!result.empty()) {
             setCurrentImage(result);

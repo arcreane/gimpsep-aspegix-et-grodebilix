@@ -1,6 +1,7 @@
 #ifndef BACKGROUNDREMOVER_H
 #define BACKGROUNDREMOVER_H
 
+#include <qcolor.h>
 #include <opencv2/opencv.hpp>
 
 
@@ -19,6 +20,11 @@ class backgroundRemover {
     cv::Mat thresholding();
     cv::Mat chromaKey();
 
+  cv::Mat backgroundRemoverGUI(int mode, int thresholdValue, int hTolerance, int sTolerance, int vTolerance);
+
+  cv::Mat thresholdingGUI(int threshold);
+
+  cv::Mat chromaKeyGUI(QColor qcolor, int hTolerance, int sTolerance, int vTolerance);
 };
 
 #endif //BACKGROUNDREMOVER_H

@@ -15,7 +15,7 @@ class faceDetection {
     cv::Mat detectFromImage(cv::Mat image);
     cv::Mat detectFromWebcam();
 
-
+  cv::Mat detectFacesGUI(cv::Mat image);
 };
 
 
