@@ -19,6 +19,8 @@
 #include "panorama/panorama.h"
 #include "remove-background/backgroundRemover.h"
 #include "resize/resize.h"
+#include "filters/filters.h"
+#include "temperature/temperature.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), img(nullptr), iface(nullptr) {
@@ -127,6 +129,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->backgroundRemoverButton, &QPushButton::clicked, this, &MainWindow::onApplyBackgroundRemoval);
     connect(ui->brightnessButton, &QPushButton::clicked, this, &MainWindow::onApplyBrightness);
     connect(ui->resizeButton, &QPushButton::clicked, this, &MainWindow::onApplyResize);
+    connect(ui->filterButton, &QPushButton::clicked, this, &MainWindow::onApplyFilters);
+    connect(ui->temperatureButton, &QPushButton::clicked, this, &MainWindow::onApplyTemperature);
 
     connect(ui->loadButton, &QPushButton::clicked, this, &MainWindow::onLoadImage);
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::onSaveImage);
@@ -839,6 +843,119 @@ void MainWindow::onApplyPanorama() {
 
     dialog.exec();
 }
+
+
+// Filters
+
+void MainWindow::onApplyFilters() {
+    if (!iface) return;
+
+    filters filterProcessor;
+    cv::Mat inputImage = iface->getCurrentImage();
+    cv::Mat result = inputImage.clone();
+
+    QDialog dialog(this);
+    dialog.setWindowTitle("Apply Filters");
+    dialog.resize(800, 600);
+
+    QVBoxLayout* layout = new QVBoxLayout(&dialog);
+    QLabel* imageLabel = new QLabel(&dialog);
+    imageLabel->setFixedSize(700, 500);
+    layout->addWidget(imageLabel);
+
+    // Radio buttons for filters
+    QGroupBox* filterGroup = new QGroupBox("Select Filter", &dialog);
+    QVBoxLayout* filterLayout = new QVBoxLayout();
+
+    QRadioButton* cartoonBtn = new QRadioButton("Cartoon");
+    QRadioButton* vintageBtn = new QRadioButton("Vintage");
+    QRadioButton* bwBtn = new QRadioButton("Black & White");
+    cartoonBtn->setChecked(true);
+
+    filterLayout->addWidget(cartoonBtn);
+    filterLayout->addWidget(vintageBtn);
+    filterLayout->addWidget(bwBtn);
+    filterGroup->setLayout(filterLayout);
+    layout->addWidget(filterGroup);
+
+    QPushButton* applyButton = new QPushButton("Apply", &dialog);
+    layout->addWidget(applyButton);
+
+    auto updateImage = [&]() {
+        int filterIndex = 1;  // default: cartoon
+        if (vintageBtn->isChecked()) {
+            filterIndex = 2;
+        } else if (bwBtn->isChecked()) {
+            filterIndex = 3;
+        }
+
+        result = filterProcessor.applyFiltersGUI(inputImage, filterIndex);
+
+        imageLabel->setPixmap(QPixmap::fromImage(matToQImage(result)).scaled(
+            imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    };
+
+    connect(cartoonBtn, &QRadioButton::toggled, &dialog, updateImage);
+    connect(vintageBtn, &QRadioButton::toggled, &dialog, updateImage);
+    connect(bwBtn, &QRadioButton::toggled, &dialog, updateImage);
+
+    connect(applyButton, &QPushButton::clicked, [&]() {
+        iface->setCurrentImage(result.clone());
+        img->addImageToHistorique(result.clone());
+        showImage(result.clone());
+        dialog.accept();
+    });
+
+    updateImage();  // Show initial preview
+    dialog.exec();
+}
+
+
+// Temperature
+
+void MainWindow::onApplyTemperature() {
+    if (!iface) return;
+
+    temperature tempProcessor;
+    cv::Mat result;
+
+    QDialog dialog(this);
+    dialog.setWindowTitle("Adjust Temperature");
+    dialog.resize(800, 600);
+
+    QVBoxLayout* layout = new QVBoxLayout(&dialog);
+    QLabel* imageLabel = new QLabel(&dialog);
+    imageLabel->setFixedSize(700, 500);
+    layout->addWidget(imageLabel);
+
+    QSlider* tempSlider = new QSlider(Qt::Horizontal, &dialog);
+    tempSlider->setRange(0, 200);    // 0 (cold) → 200 (warm), 100 = neutral
+    tempSlider->setValue(100);
+    layout->addWidget(new QLabel("Temperature (0=cold, 200=warm)"));
+    layout->addWidget(tempSlider);
+
+    QPushButton* applyButton = new QPushButton("Apply", &dialog);
+    layout->addWidget(applyButton);
+
+    auto updateImage = [&]() {
+        result = tempProcessor.changeTemperatureGUI(iface->getCurrentImage(), tempSlider->value());
+        imageLabel->setPixmap(QPixmap::fromImage(matToQImage(result)).scaled(
+            imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    };
+
+    connect(tempSlider, &QSlider::valueChanged, &dialog, updateImage);
+
+    connect(applyButton, &QPushButton::clicked, [&]() {
+        iface->setCurrentImage(result.clone());
+        img->addImageToHistorique(result.clone());
+        showImage(result.clone());
+        dialog.accept();
+    });
+
+    updateImage();
+    dialog.exec();
+}
+
 
 
 void MainWindow::showImage(const cv::Mat& mat) {

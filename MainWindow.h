@@ -60,6 +60,10 @@ public:
 
     void onApplyPanorama();
 
+    void onApplyFilters();
+
+    void onApplyTemperature();
+
 private:
     Ui::MainWindow *ui;
     QLabel* imageLabel;
