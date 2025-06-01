@@ -64,6 +64,8 @@ public:
 
     void onApplyTemperature();
 
+    void onApplyColorTracking();
+
 private:
     Ui::MainWindow *ui;
     QLabel* imageLabel;

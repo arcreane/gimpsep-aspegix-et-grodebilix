@@ -21,6 +21,7 @@
 #include "resize/resize.h"
 #include "filters/filters.h"
 #include "temperature/temperature.h"
+#include "colorTracker/colorTracker.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), img(nullptr), iface(nullptr) {
@@ -130,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->resizeButton, &QPushButton::clicked, this, &MainWindow::onApplyResize);
     connect(ui->filterButton, &QPushButton::clicked, this, &MainWindow::onApplyFilters);
     connect(ui->temperatureButton, &QPushButton::clicked, this, &MainWindow::onApplyTemperature);
+    connect(ui->colorTrackerButton, &QPushButton::clicked, this, &MainWindow::onApplyColorTracking);
 
     connect(ui->loadButton, &QPushButton::clicked, this, &MainWindow::onLoadImage);
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::onSaveImage);
@@ -1031,6 +1033,15 @@ void MainWindow::onApplyTemperature() {
 
     updateImage();
     dialog.exec();
+}
+
+// Color tracker
+
+void MainWindow::onApplyColorTracking() {
+    if (!iface) return;
+
+    colorTracker tracker;
+    tracker.trackColorFromWebcam();
 }
 
 
