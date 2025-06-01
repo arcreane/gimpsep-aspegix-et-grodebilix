@@ -84,7 +84,7 @@ namespace gimpsep {
         cv::Mat resized;
 
         if (byFactor) {
-            if (scaleFactor <= 0.01) { // treat too small as invalid, fallback to original
+            if (scaleFactor <= 0.01) { // treat too small as invalid, return original
                 return source.clone();
             }
             cv::resize(source, resized, cv::Size(), scaleFactor, scaleFactor, cv::INTER_LINEAR);

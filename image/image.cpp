@@ -1,13 +1,13 @@
 #include "image.h"
 
 image::image(std::string path){
-  // On ouvre l'image à partir du chemin spécifié
+  // Open image from the specified path
   currentImage = cv::imread(path);
   historique.push_back(currentImage);
 }
 
 image::image(cv::Mat image) {
-  // Mise à jour de l'image
+  // Update the image
   currentImage = image;
   historique.push_back(currentImage);
 }
@@ -31,7 +31,7 @@ void image::addImageToHistorique(const cv::Mat& image) {
 
 
 void image::loadNewImage(const std::string& path) {
-  // Remplacer l'image actuelle avec une nouvelle image
+  // Replace the current image with a new image from path
   if (!currentImage.empty()) {
     historique.push_back(currentImage.clone());
   }
@@ -63,7 +63,7 @@ void image::showHistory() {
 
   cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
-  // Options pour le texte en bas à droite
+  // Options for the text
   int font = cv::FONT_HERSHEY_SIMPLEX;
   double fontScale = 1.0;
   int thickness = 1;
@@ -72,42 +72,42 @@ void image::showHistory() {
   while (true) {
 
 
-    // On fait une copie pour pas rajouter du texte sur l'image pour de vrai
+    // We copy the image to not add text to the real one
     cv::Mat displayImage = historique[index].clone();
 
-    // Le texte qu'on affiche
+    // Displayed text
     std::string text = std::to_string(index + 1) + " / " + std::to_string(total);
 
-    // Taille du texte
+    // Text size
     int baseline = 0;
-    cv::Size textSize = cv::getTextSize(text, font, fontScale, thickness, &baseline);
+    textSize = cv::getTextSize(text, font, fontScale, thickness, &baseline);
 
-    // En bas à droite
+    // Bottom right
     cv::Point textOrg(displayImage.cols - textSize.width - 10, displayImage.rows - 10);
 
-    // Overlay pout le texte en noir pour qu'on puisse le voir sur fond blanc
+    // Overlay for the text to see it on a white background
     cv::putText(displayImage, text, textOrg, font, fontScale, cv::Scalar(0, 0, 0), thickness + 2);
 
-    // Texte en blanc
+    // Text in white
     cv::putText(displayImage, text, textOrg, font, fontScale, cv::Scalar(255, 255, 255), thickness);
 
-    // Affichage de l'image
+    // Display the image
     cv::imshow(windowName, displayImage);
 
-    // Visiblement les flèches ça marche pas trop donc j'ai mis Q et D
+    // The arrow keys don't seem to work so i've replaced them with A and D
 
     int key = cv::waitKey(0);
     if (key == 27) { // ESC
       break;
-    } else if (key == 'q' || key == 'Q') { // Gauche
+    } else if (key == 'q' || key == 'Q') { // Left
       index = (index - 1 + total) % total;
-    } else if (key == 'd' || key == 'D') { // Droite
+    } else if (key == 'd' || key == 'D') { // Right
       index = (index + 1) % total;
     }
 
   }
 
-  // Fermeture de la fenêtre
+  // Close the window
   cv::destroyWindow(windowName);
 
 }
@@ -118,7 +118,7 @@ void image::restoreToVersion(int version) {
     return;
   }
 
-  // On remet une ancienne vesrion de l'image
+  // We set and old version of the image
   cv::Mat temp = currentImage;
   currentImage = historique[version] - 1;
   historique.push_back(temp);

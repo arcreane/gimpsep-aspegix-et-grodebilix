@@ -12,8 +12,8 @@ cv::Mat faceDetection::detectFromImage(cv::Mat image) {
 
   cv::Mat backup = image.clone();
 
-  // On crée une copie en noir et blanc
-  // Vérif de sécurité pour éviter les bugs quand veux transformer une image noir & blanc en noir & blanc
+  // Create a black and white copy
+  // Checking that the image is not already in black and white
   cv::Mat gray;
   if (image.channels() == 3) {
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
@@ -21,29 +21,29 @@ cv::Mat faceDetection::detectFromImage(cv::Mat image) {
     gray = image;
   }
 
-  // Askip c'est mieux pour le contrast
+  // Better for contrast apparently
   cv::equalizeHist(gray, gray);
 
-  // Liste des visages détectés
+  // List of the detected faces
   std::vector<cv::Rect> faces;
   faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, cv::Size(30, 30));
 
-  // Rectangle qu'on affiche autour d'un visage
+  // Rectangles displayed around a face
   for (const auto& face : faces) {
         cv::rectangle(image, face, cv::Scalar(255, 0, 0), 2);
   }
 
-  // Création de la fenêtre
+  // Creation of the window
   std::string windowName = "FaceDetection";
   cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
-  // Affichage de l'image
+  // Display the image
   cv::imshow(windowName, image);
 
-  // Attente de l'input de l'utilisateur
+  // Wait for user input
   cv::waitKey(0);
 
-  // Fermer la fenêtre
+  // Close the window
   cv::destroyWindow(windowName);
 
   return image;
@@ -55,7 +55,7 @@ cv::Mat faceDetection::detectFromWebcam() {
 
   cv::VideoCapture cap = cv::VideoCapture(0);
 
-  // Vérifier que la caméra est ouverte
+  // Check that webcam is open
   if(!cap.isOpened()){
     std::cout << "Error opening video stream or file" << std::endl;
   }
@@ -68,7 +68,8 @@ cv::Mat faceDetection::detectFromWebcam() {
 
 
       cv::Mat frame;
-      // Capture frame-by-frame
+
+    // Capture frame-by-frame
       cap >> frame;
 
       // If the frame is empty, break immediately
@@ -83,14 +84,14 @@ cv::Mat faceDetection::detectFromWebcam() {
         gray = frame;
       }
 
-      // Askip c'est mieux pour le contrast
+      // Apparently better for contrast
       cv::equalizeHist(gray, gray);
 
-      // Création de la liste des visages détectés (les rectangles autours mais c'est pareil sayez là)
+      // Creation of the list of rectangles
       std::vector<cv::Rect> faces;
       faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, cv::Size(30, 30));
 
-      // Rectangles autour des visages
+      // Rectangles around the faces
       for (const auto& face : faces) {
         cv::rectangle(frame, face, cv::Scalar(255, 0, 0), 2);
       }
@@ -107,7 +108,7 @@ cv::Mat faceDetection::detectFromWebcam() {
 
   }
 
-  // Fermeture de la fenêtre
+  // Close the window
   cv::destroyWindow(windowName);
 
   return result;
@@ -116,6 +117,7 @@ cv::Mat faceDetection::detectFromWebcam() {
 cv::Mat faceDetection::detectFacesGUI(cv::Mat image) {
   cv::Mat result = image.clone();
 
+  // Check if the image is in black and white and convert it if not
   cv::Mat gray;
   if (result.channels() == 3) {
     cv::cvtColor(result, gray, cv::COLOR_BGR2GRAY);
@@ -123,8 +125,10 @@ cv::Mat faceDetection::detectFacesGUI(cv::Mat image) {
     gray = result;
   }
 
+  // For better contrast
   cv::equalizeHist(gray, gray);
 
+  // List of the rectangles
   std::vector<cv::Rect> faces;
   faceCascade.detectMultiScale(gray, faces, 1.1, 3, 0, cv::Size(30, 30));
 

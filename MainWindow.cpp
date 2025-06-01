@@ -32,12 +32,10 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *openAction = fileMenu->addAction("Open");
     QAction *saveAction = fileMenu->addAction("Save");
     QAction *exitAction = fileMenu->addAction("Exit");
-    QAction *openWebcamAction = fileMenu->addAction("Open webcam");
 
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(exitAction);
-    fileMenu->addAction(openWebcamAction);
 
     // Edit menu
 
@@ -82,20 +80,20 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // Erosion
-    connect(erodeGrayScaleAction, &QAction::triggered, this, &MainWindow::onApplyErosionGrayScale);
-    connect(erodeColorAction, &QAction::triggered, this, &MainWindow::onApplyErosionColor);
+    connect(erodeGrayScaleAction, &QAction::triggered, this, &MainWindow::onApplyErosion);
+    connect(erodeColorAction, &QAction::triggered, this, &MainWindow::onApplyErosion);
 
     // Dilatation
-    connect(dilatationGrayScaleAction, &QAction::triggered, this, &MainWindow::onApplyDilatationGrayScale);
-    connect(dilatationColorAction, &QAction::triggered, this, &MainWindow::onApplyDilatationColor);
+    connect(dilatationGrayScaleAction, &QAction::triggered, this, &MainWindow::onApplyErosion);
+    connect(dilatationColorAction, &QAction::triggered, this, &MainWindow::onApplyErosion);
 
     // Background removal
-    connect(foregroundExtractionAction, &QAction::triggered, this, &MainWindow::onApplyForegroundExtraction);
-    connect(thresholdingAction, &QAction::triggered, this, &MainWindow::onApplyThresholding);
-    connect(chromaKeyAction, &QAction::triggered, this, &MainWindow::onApplyChromaKey);
+    connect(foregroundExtractionAction, &QAction::triggered, this, &MainWindow::onApplyBackgroundRemoval);
+    connect(thresholdingAction, &QAction::triggered, this, &MainWindow::onApplyBackgroundRemoval);
+    connect(chromaKeyAction, &QAction::triggered, this, &MainWindow::onApplyBackgroundRemoval);
 
     // Brightness
-    connect(brightenAction, &QAction::triggered, this, &MainWindow::onApplyBrighten);
+    connect(brightenAction, &QAction::triggered, this, &MainWindow::onApplyBrightness);
 
     // Resize
     // connect(resizeAction, &QAction::triggered, this, &MainWindow::onApplyResize);
@@ -109,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // File
     connect(openAction, &QAction::triggered, this, &MainWindow::onLoadImage);
+    connect(saveAction, &QAction::triggered, this, &MainWindow::onSaveImage);
 
     // Create the submenu for the brightness button
     QMenu *faceDetectionMenu2 = new QMenu(this);
@@ -122,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Set the popup mode so clicking opens the menu immediately
     ui->brightnessButton->setPopupMode(QToolButton::InstantPopup);
 
-
+    // Connect the buttons to their respective functions
     connect(ui->cannyButton, &QPushButton::clicked, this, &MainWindow::onApplyCanny);
     connect(ui->erosionButton, &QPushButton::clicked, this, &MainWindow::onApplyErosion);
     connect(ui->panoramaButton, &QPushButton::clicked, this, &MainWindow::onApplyPanorama);
@@ -152,6 +151,26 @@ QImage matToQImage(cv::Mat& mat) {
     return QImage((const uchar *)rgb.data, rgb.cols, rgb.rows, rgb.step, QImage::Format_RGB888).copy();
 }
 
+cv::Mat ensure3Channels(const cv::Mat& src) {
+    cv::Mat dst;
+
+    if (src.channels() == 3) {
+        dst = src.clone();
+    }
+    else if (src.channels() == 1) {
+        cv::cvtColor(src, dst, cv::COLOR_GRAY2BGR);
+    }
+    else if (src.channels() == 4) {
+        cv::cvtColor(src, dst, cv::COLOR_BGRA2BGR);
+    }
+    else {
+        // If an unexpected number of channels occurs, just return the original
+        dst = src.clone();
+    }
+
+    return dst;
+}
+
 void MainWindow::onLoadImage() {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Image", "", "Images (*.png *.jpg *.bmp)");
     if (!fileName.isEmpty()) {
@@ -167,10 +186,10 @@ void MainWindow::onLoadImage() {
 
 void MainWindow::openParameterDialog() {
     QDialog dialog(this);
-    dialog.setWindowTitle("My Mini Dialog");
+    dialog.setWindowTitle("Test dialog");
 
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
-    QLabel* label = new QLabel("Hello, this is a mini dialog!", &dialog);
+    QLabel* label = new QLabel("Test dialog", &dialog);
     QPushButton* okButton = new QPushButton("OK", &dialog);
 
     layout->addWidget(label);
@@ -186,7 +205,7 @@ void MainWindow::onSaveImage() {
     QString fileName = QFileDialog::getSaveFileName(this, "Save Image", "", "Images (*.png *.jpg *.bmp)");
 
     if (fileName.isEmpty()) {
-        return; // User cancelled
+        return; // User cancel
     }
 
     std::string stdFileName = fileName.toStdString();
@@ -224,18 +243,22 @@ void MainWindow::onApplyErosionColor() {
 void MainWindow::onApplyErosion() {
     if (!iface) return;
 
+    // Create instance of erosion class
     erosion ero;
     cv::Mat result;
 
+    // Create dialog
     QDialog dialog(this);
     dialog.setWindowTitle("Erosion / Dilation");
     dialog.resize(800, 600);
 
+    // Create layout
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QLabel* imageLabel = new QLabel(&dialog);
     imageLabel->setFixedSize(700, 500);
     layout->addWidget(imageLabel);
 
+    // Create slider
     QSlider* sizeSlider = new QSlider(Qt::Horizontal, &dialog);
     sizeSlider->setRange(0, 10);
     sizeSlider->setValue(1);
@@ -337,13 +360,16 @@ void MainWindow::onApplyForegroundExtraction() {
 void MainWindow::onApplyBackgroundRemoval() {
     if (!iface) return;
 
+    // Create bgRemover object
     backgroundRemover remover(iface->getCurrentImage());
     cv::Mat result;
 
+    // Create the dialog
     QDialog dialog(this);
     dialog.setWindowTitle("Background Removal");
     dialog.resize(800, 650);
 
+    // Add a layout to the dialog
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QLabel* imageLabel = new QLabel(&dialog);
     imageLabel->setFixedSize(700, 500);
@@ -353,6 +379,7 @@ void MainWindow::onApplyBackgroundRemoval() {
     QGroupBox* modeGroup = new QGroupBox("Mode", &dialog);
     QHBoxLayout* modeLayout = new QHBoxLayout();
 
+    // Add the radiobuttons
     QRadioButton* fgExtractBtn = new QRadioButton("Foreground Extraction");
     QRadioButton* thresholdingBtn = new QRadioButton("Thresholding");
     QRadioButton* chromaKeyBtn = new QRadioButton("Chroma Key");
@@ -364,7 +391,7 @@ void MainWindow::onApplyBackgroundRemoval() {
     modeGroup->setLayout(modeLayout);
     layout->addWidget(modeGroup);
 
-    // Threshold slider (for Thresholding mode)
+    // Threshold slider
     QLabel* thresholdLabel = new QLabel("Threshold Value");
     QSlider* thresholdSlider = new QSlider(Qt::Horizontal, &dialog);
     thresholdSlider->setRange(0, 255);
@@ -372,17 +399,19 @@ void MainWindow::onApplyBackgroundRemoval() {
     layout->addWidget(thresholdLabel);
     layout->addWidget(thresholdSlider);
 
-    // HSV sliders (for Chroma Key mode)
+    // HSV sliders
     QLabel* hueLabel = new QLabel("Hue Tolerance");
     QSlider* hueSlider = new QSlider(Qt::Horizontal, &dialog);
     hueSlider->setRange(0, 30);
     hueSlider->setValue(10);
 
+    // Saturation slider
     QLabel* satLabel = new QLabel("Saturation Tolerance");
     QSlider* satSlider = new QSlider(Qt::Horizontal, &dialog);
     satSlider->setRange(0, 100);
     satSlider->setValue(60);
 
+    // Value slider
     QLabel* valLabel = new QLabel("Value Tolerance");
     QSlider* valSlider = new QSlider(Qt::Horizontal, &dialog);
     valSlider->setRange(0, 100);
@@ -395,9 +424,11 @@ void MainWindow::onApplyBackgroundRemoval() {
     layout->addWidget(valLabel);
     layout->addWidget(valSlider);
 
+    // Button to "launch" color picker
     QPushButton* colorButton = new QPushButton("Select Color (for Chroma Key)", &dialog);
     layout->addWidget(colorButton);
 
+    // Apply button
     QPushButton* applyButton = new QPushButton("Apply", &dialog);
     layout->addWidget(applyButton);
 
@@ -423,6 +454,7 @@ void MainWindow::onApplyBackgroundRemoval() {
         colorButton->setVisible(isChromaKey);
     };
 
+    // Remove the background and update the displayed image
     auto updateImage = [&]() {
         updateUIVisibility();
 
@@ -457,10 +489,12 @@ void MainWindow::onApplyBackgroundRemoval() {
         }
     });
 
+    // Apply the changes and convert the image to 3 channels
     connect(applyButton, &QPushButton::clicked, [&]() {
-        iface->setCurrentImage(result.clone());
-        img->addImageToHistorique(result.clone());
-        showImage(result.clone());
+        cv::Mat convertedResult = ensure3Channels(result);
+        iface->setCurrentImage(convertedResult.clone());
+        img->addImageToHistorique(convertedResult.clone());
+        showImage(convertedResult.clone());
         dialog.accept();
     });
 
@@ -505,19 +539,24 @@ void MainWindow::onApplyChromaKey() {
 void MainWindow::onApplyResize() {
     if (!iface) return;
 
+    // Create an instance of the resize class
+    // Had to create a namespace to get rid of confusion with qt resize
     gimpsep::resize resizer;
     cv::Mat inputImage = iface->getCurrentImage();
     cv::Mat result;
 
+    // Create dialog
     QDialog dialog(this);
     dialog.setWindowTitle("Resize Image");
     dialog.resize(800, 600);
 
+    // Create layout
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QLabel* imageLabel = new QLabel(&dialog);
     imageLabel->setFixedSize(700, 500);
     layout->addWidget(imageLabel);
 
+    // Create radio buttons
     QGroupBox* modeGroup = new QGroupBox("Resize Mode", &dialog);
     QHBoxLayout* modeLayout = new QHBoxLayout();
 
@@ -530,18 +569,21 @@ void MainWindow::onApplyResize() {
     modeGroup->setLayout(modeLayout);
     layout->addWidget(modeGroup);
 
+    // Create slider for scale
     QSlider* scaleSlider = new QSlider(Qt::Horizontal, &dialog);
     scaleSlider->setRange(1, 300);  // 1% to 300%
     scaleSlider->setValue(100);
     layout->addWidget(new QLabel("Scale Factor (%)"));
     layout->addWidget(scaleSlider);
 
+    // Create the input for width
     QSpinBox* widthSpin = new QSpinBox(&dialog);
     widthSpin->setRange(1, inputImage.cols * 5);
     widthSpin->setValue(inputImage.cols);
     layout->addWidget(new QLabel("Width (pixels)"));
     layout->addWidget(widthSpin);
 
+    // Create the input for height
     QSpinBox* heightSpin = new QSpinBox(&dialog);
     heightSpin->setRange(1, inputImage.rows * 5);
     heightSpin->setValue(inputImage.rows);
@@ -552,9 +594,11 @@ void MainWindow::onApplyResize() {
     widthSpin->setEnabled(false);
     heightSpin->setEnabled(false);
 
+    // Apply button
     QPushButton* applyButton = new QPushButton("Apply", &dialog);
     layout->addWidget(applyButton);
 
+    // Apply modifications and update the image
     auto updateImage = [&]() {
         bool byFactor = factorBtn->isChecked();
         scaleSlider->setEnabled(byFactor);
@@ -578,6 +622,7 @@ void MainWindow::onApplyResize() {
     connect(widthSpin, QOverload<int>::of(&QSpinBox::valueChanged), &dialog, updateImage);
     connect(heightSpin, QOverload<int>::of(&QSpinBox::valueChanged), &dialog, updateImage);
 
+    // Apply modifications
     connect(applyButton, &QPushButton::clicked, [&]() {
         iface->setCurrentImage(result.clone());
         img->addImageToHistorique(result.clone());
@@ -606,19 +651,23 @@ void MainWindow::onApplyBrighten() {
 void MainWindow::onApplyBrightness() {
     if (!iface) return;
 
+    // Create instance of brightness object
     brightness bright;
     cv::Mat inputImage = iface->getCurrentImage();
     cv::Mat result;
 
+    // Create dialog
     QDialog dialog(this);
     dialog.setWindowTitle("Brightness Adjustment");
     dialog.resize(800, 600);
 
+    // Create layout and image
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QLabel* imageLabel = new QLabel(&dialog);
     imageLabel->setFixedSize(700, 500);
     layout->addWidget(imageLabel);
 
+    // Create radio buttons to choose mode
     QGroupBox* modeGroup = new QGroupBox("Mode", &dialog);
     QHBoxLayout* modeLayout = new QHBoxLayout();
 
@@ -631,15 +680,18 @@ void MainWindow::onApplyBrightness() {
     modeGroup->setLayout(modeLayout);
     layout->addWidget(modeGroup);
 
+    // Value slider
     QSlider* valueSlider = new QSlider(Qt::Horizontal, &dialog);
     valueSlider->setRange(0, 100);
     valueSlider->setValue(50);
     layout->addWidget(new QLabel("Brightness Value"));
     layout->addWidget(valueSlider);
 
+    // Apply button
     QPushButton* applyButton = new QPushButton("Apply", &dialog);
     layout->addWidget(applyButton);
 
+    // Apply the modification and update the image
     auto updateImage = [&]() {
         int mode = brighterBtn->isChecked() ? 1 : 2;
         int value = valueSlider->value();
@@ -653,6 +705,7 @@ void MainWindow::onApplyBrightness() {
     connect(brighterBtn, &QRadioButton::toggled, &dialog, updateImage);
     connect(darkerBtn, &QRadioButton::toggled, &dialog, updateImage);
 
+    // Apply the modifications
     connect(applyButton, &QPushButton::clicked, [&]() {
         iface->setCurrentImage(result.clone());
         img->addImageToHistorique(result.clone());
@@ -676,27 +729,33 @@ void MainWindow::onApplyCanny() {
     // img->addImageToHistorique(newImg);
     // showImage(newImg);
 
+    // Create dialog
     QDialog dialog(this);
     dialog.setWindowTitle("Canny edge detection");
     dialog.resize(800, 600);
 
+    // Dialog layout
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QLabel* imageLabel = new QLabel(&dialog);
     layout->addWidget(imageLabel);
 
+    // Apply button
     QPushButton* applyButton = new QPushButton("Apply", &dialog);
     layout->addWidget(applyButton);
 
+    // Low threshold slider
     QSlider* lowSlider = new QSlider(Qt::Horizontal, &dialog);
     lowSlider->setRange(0, 300);
     lowSlider->setValue(50);
     layout->addWidget(lowSlider);
 
+    // High threshold slider
     QSlider* highSlider = new QSlider(Qt::Horizontal, &dialog);
     highSlider->setRange(0, 300);
     highSlider->setValue(150);
     layout->addWidget(highSlider);
 
+    // Canny edge detection function and update displayed image
     cv::Mat result;
     auto updateImage = [&]() {
         result = can.detectEdgesGUI(iface->getCurrentImage(), lowSlider->value(), highSlider->value());
@@ -714,11 +773,13 @@ void MainWindow::onApplyCanny() {
     connect(lowSlider, &QSlider::valueChanged, &dialog, updateImage);
     connect(highSlider, &QSlider::valueChanged, &dialog, updateImage);
 
+    // Apply the changes and convert to 3 channel
     connect(applyButton, &QPushButton::clicked, [&]() {
 
-        iface->setCurrentImage(result.clone());
-        img->addImageToHistorique(result.clone());
-        showImage(result.clone());
+        cv::Mat convertedResult = ensure3Channels(result);
+        iface->setCurrentImage(convertedResult.clone());
+        img->addImageToHistorique(convertedResult.clone());
+        showImage(convertedResult.clone());
 
         dialog.accept();
     });
@@ -850,14 +911,17 @@ void MainWindow::onApplyPanorama() {
 void MainWindow::onApplyFilters() {
     if (!iface) return;
 
+    // Create instance of filter
     filters filterProcessor;
     cv::Mat inputImage = iface->getCurrentImage();
     cv::Mat result = inputImage.clone();
 
+    // Create the dialog
     QDialog dialog(this);
     dialog.setWindowTitle("Apply Filters");
     dialog.resize(800, 600);
 
+    // Create the dialog and the image
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QLabel* imageLabel = new QLabel(&dialog);
     imageLabel->setFixedSize(700, 500);
@@ -867,6 +931,7 @@ void MainWindow::onApplyFilters() {
     QGroupBox* filterGroup = new QGroupBox("Select Filter", &dialog);
     QVBoxLayout* filterLayout = new QVBoxLayout();
 
+    // Add radio buttons for the different modes
     QRadioButton* cartoonBtn = new QRadioButton("Cartoon");
     QRadioButton* vintageBtn = new QRadioButton("Vintage");
     QRadioButton* bwBtn = new QRadioButton("Black & White");
@@ -881,6 +946,7 @@ void MainWindow::onApplyFilters() {
     QPushButton* applyButton = new QPushButton("Apply", &dialog);
     layout->addWidget(applyButton);
 
+    // Apply the filter and update the image
     auto updateImage = [&]() {
         int filterIndex = 1;  // default: cartoon
         if (vintageBtn->isChecked()) {
@@ -899,14 +965,17 @@ void MainWindow::onApplyFilters() {
     connect(vintageBtn, &QRadioButton::toggled, &dialog, updateImage);
     connect(bwBtn, &QRadioButton::toggled, &dialog, updateImage);
 
+    // Apply the changes and update the image to 3 channels
     connect(applyButton, &QPushButton::clicked, [&]() {
-        iface->setCurrentImage(result.clone());
-        img->addImageToHistorique(result.clone());
-        showImage(result.clone());
+        cv::Mat convertedResult = ensure3Channels(result);
+        iface->setCurrentImage(convertedResult.clone());
+        img->addImageToHistorique(convertedResult.clone());
+        showImage(convertedResult.clone());
         dialog.accept();
     });
 
-    updateImage();  // Show initial preview
+    // Show initial preview
+    updateImage();
     dialog.exec();
 }
 
@@ -916,27 +985,33 @@ void MainWindow::onApplyFilters() {
 void MainWindow::onApplyTemperature() {
     if (!iface) return;
 
+    // Create instance of temperature class
     temperature tempProcessor;
     cv::Mat result;
 
+    //Create the dialog
     QDialog dialog(this);
     dialog.setWindowTitle("Adjust Temperature");
     dialog.resize(800, 600);
 
+    // Create the layout
     QVBoxLayout* layout = new QVBoxLayout(&dialog);
     QLabel* imageLabel = new QLabel(&dialog);
     imageLabel->setFixedSize(700, 500);
     layout->addWidget(imageLabel);
 
+    // Temperature slider
     QSlider* tempSlider = new QSlider(Qt::Horizontal, &dialog);
-    tempSlider->setRange(0, 200);    // 0 (cold) → 200 (warm), 100 = neutral
+    tempSlider->setRange(0, 200);
     tempSlider->setValue(100);
     layout->addWidget(new QLabel("Temperature (0=cold, 200=warm)"));
     layout->addWidget(tempSlider);
 
+    // Apply button
     QPushButton* applyButton = new QPushButton("Apply", &dialog);
     layout->addWidget(applyButton);
 
+    // Apply the modification and update the image
     auto updateImage = [&]() {
         result = tempProcessor.changeTemperatureGUI(iface->getCurrentImage(), tempSlider->value());
         imageLabel->setPixmap(QPixmap::fromImage(matToQImage(result)).scaled(
@@ -945,10 +1020,12 @@ void MainWindow::onApplyTemperature() {
 
     connect(tempSlider, &QSlider::valueChanged, &dialog, updateImage);
 
+    // Apply and convert to 3 channels
     connect(applyButton, &QPushButton::clicked, [&]() {
-        iface->setCurrentImage(result.clone());
-        img->addImageToHistorique(result.clone());
-        showImage(result.clone());
+        cv::Mat convertedResult = ensure3Channels(result);
+        iface->setCurrentImage(convertedResult.clone());
+        img->addImageToHistorique(convertedResult.clone());
+        showImage(convertedResult.clone());
         dialog.accept();
     });
 

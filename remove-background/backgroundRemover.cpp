@@ -81,7 +81,7 @@ cv::Mat backgroundRemover::thresholding() {
 void backgroundRemover::onMouse(int event, int x, int y, int, void* userdata) {
   if (event != cv::EVENT_LBUTTONDOWN) return;
 
-  // On trouve la couleur à l'emplacement de la sourie
+  // Find the color at the mouse position
   backgroundRemover* self = static_cast<backgroundRemover*>(userdata);
   self->selectedColor = self->image.at<cv::Vec3b>(y, x);
   self->colorSelected = true;
@@ -153,7 +153,7 @@ cv::Mat backgroundRemover::backgroundRemoverGUI(int mode, int thresholdValue, in
 
   } else if (mode == 2) {  // Chroma key
     if (!colorSelected) {
-      // fallback: no color picked yet, return original
+      // if no color picked return the original
       return image;
     }
 
@@ -180,34 +180,6 @@ cv::Mat backgroundRemover::backgroundRemoverGUI(int mode, int thresholdValue, in
   return result;
 }
 
-// cv::Mat backgroundRemover::chromaKeyGUI(QColor qcolor, int hTolerance, int sTolerance, int vTolerance) {
-//   cv::Mat img = image.clone();
-//
-//   cv::Mat selected(1, 1, CV_8UC3, cv::Vec3b(qcolor.blue(), qcolor.green(), qcolor.red()));  // Qt uses RGB, OpenCV uses BGR
-//   cv::Mat selectedHSV;
-//   cv::cvtColor(selected, selectedHSV, cv::COLOR_BGR2HSV);
-//   cv::Vec3b targetHSV = selectedHSV.at<cv::Vec3b>(0, 0);
-//
-//   cv::Scalar lower(targetHSV[0] - hTolerance, std::max(0, targetHSV[1] - sTolerance), std::max(0, targetHSV[2] - vTolerance));
-//   cv::Scalar upper(targetHSV[0] + hTolerance, std::min(255, targetHSV[1] + sTolerance), std::min(255, targetHSV[2] + vTolerance));
-//
-//   cv::Mat hsvImg;
-//   cv::cvtColor(img, hsvImg, cv::COLOR_BGR2HSV);
-//   cv::Mat mask;
-//   cv::inRange(hsvImg, lower, upper, mask);
-//
-//   cv::Mat result(image.size(), image.type(), cv::Scalar(0, 0, 0));
-//   cv::Mat invertedMask;
-//   cv::bitwise_not(mask, invertedMask);
-//   image.copyTo(result, invertedMask);
-//
-//   return result;
-// }
-
-
-// In backgroundRemover.cpp (implementations)
-
-// Thresholding that uses a slider value, no GUI window or waitKey
 cv::Mat backgroundRemover::thresholdingGUI(int threshold) {
   cv::Mat gray, binary;
 
@@ -229,7 +201,7 @@ cv::Mat backgroundRemover::thresholdingGUI(int threshold) {
 cv::Mat backgroundRemover::chromaKeyGUI(QColor qcolor, int hTolerance, int sTolerance, int vTolerance) {
   cv::Mat img = image.clone();
 
-  // Convert QColor (RGB) to OpenCV BGR order
+  // Convert QColor RGB to OpenCV BGR order
   cv::Vec3b bgrPixel(qcolor.blue(), qcolor.green(), qcolor.red());
 
   cv::Mat selected(1, 1, CV_8UC3, bgrPixel);

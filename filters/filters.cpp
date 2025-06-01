@@ -7,7 +7,7 @@ filters::~filters(){}
 
 void  filters::applyFilters(cv::Mat &img, int filterIndex){
 
-    // Il y a 3 filtres : 1 cartoon, 2 vintage, 3 noir et blanc
+    // There are three filters : 1 cartoon, 2 vintage, 3 black and white
 
     switch (filterIndex)
 {

@@ -8,17 +8,17 @@ cv::Mat canny::detectEdges(cv::Mat image) {
 
   bool cancel = false;
 
-  // Création de la fenêtre
+  // Create the window
   std::string windowName = "Edge detection";
   cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
-  // Création des trackbars
+  // Create the tackbars
   int lowThreshold = 50;
   int highThreshold = 150;
   cv::createTrackbar("Low threshold", windowName, &lowThreshold, 500, 0, 0);
   cv::createTrackbar("High threshold", windowName, &highThreshold, 500, 0, 0);
 
-  // Création de l'image en noir et blanc
+  // Create the black and white image
   cv::Mat gray;
   if (image.channels() == 3) {
     cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
@@ -27,21 +27,16 @@ cv::Mat canny::detectEdges(cv::Mat image) {
   }
 
 
-  // Si on rajoute du flou ça rends plus clean sur certaines images mais on perds du détail
-  // Je vais commenter pour l'instant à voir si on garde
-  // cv::Mat blurred;
-  // cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 1.4);
-
   cv::Mat edges;
 
   while (true) {
     // Edge detection
     cv::Canny(image, edges, lowThreshold, highThreshold);
 
-    // Affichage de l'image
+    // Display the image
     cv::imshow(windowName, edges);
 
-    // On attends l'input de l'utilisateur
+    // Wait for user input
     int key = cv::waitKey(10);
 
     //ESC
@@ -56,7 +51,7 @@ cv::Mat canny::detectEdges(cv::Mat image) {
     }
   }
 
-  // Fermeture de la fenêtre
+  // Closing the window
   cv::destroyWindow(windowName);
 
   if (cancel) {

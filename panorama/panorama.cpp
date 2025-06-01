@@ -18,7 +18,7 @@ cv::Mat panorama::stitchImages() {
 
     bool stop = false;
 
-    // On charge toutes les images du panorama
+    // Load every image in the panorama
     while (!stop) {
         std::string imgPath;
         std::string response = "";
@@ -37,17 +37,17 @@ cv::Mat panorama::stitchImages() {
 
     cv::Mat result;
 
-    // Création du stitcher
+    // Creation of the sticher
     cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(cv::Stitcher::PANORAMA);
     cv::Stitcher::Status status = stitcher->stitch(images, result);
 
-    // Si ça marche pas on renvoie la première image
+    // If it doesn't work return the original image
     if (status != cv::Stitcher::OK) {
         std::cout << "Can't stitch images, error code = " << int(status) << std::endl;
         return images[0];
     }
 
-    // Création et affichage de la fenêtre
+    // Creation and display of the window
     std::string windowName = "Panorama";
 
     cv::imshow(windowName, result);
@@ -73,7 +73,7 @@ cv::Mat panorama::stitchImagesGUI() {
 
     if (status != cv::Stitcher::OK) {
         std::cerr << "Can't stitch images, error code = " << int(status) << std::endl;
-        return cv::Mat();  // Return empty on failure
+        return cv::Mat();  // Return empty image if it fails
     }
 
     return result;

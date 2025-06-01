@@ -8,7 +8,7 @@ temperature::~temperature() {}
 
 void temperature::changeTemperature(cv::Mat &img, int temperature_value){
 
-    // temperature_value : 0 (froid) à 200 (chaud), 100 = aucun traitement
+    // temperature_value : 0 (cold) à 200 (hot), 100 = no changes
 
     const double alpha = (temperature_value - 100) * 0.01;
     vector<Mat> channels(3);
